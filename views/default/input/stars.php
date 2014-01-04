@@ -65,7 +65,7 @@ if (isset($vars['step'])) {
 	$options['data-rateit-step'] = $settings['step'];
 }
 
-$options = array_merge($options, elgg_clean_vars($vars));
+$options = array_merge($vars, $options);
 $attrs = elgg_format_attributes($options);
 
 echo "<div $attrs></div>";

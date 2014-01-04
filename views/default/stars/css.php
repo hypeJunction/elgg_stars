@@ -118,6 +118,9 @@ $del_url = elgg_normalize_url('mod/elgg_stars/vendors/rateit/delete.gif');
 		margin: 0;
 		padding: 0;
 	}
+	.elgg-form-stars-rate fieldset > div {
+		margin-bottom: 0;
+	}
 	.elgg-form-stars-rate input[type="submit"] {
 		display: none;
 	}
