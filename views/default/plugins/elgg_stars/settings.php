@@ -88,7 +88,7 @@ $criteria = ($entity->criteria) ? string_to_tag_array($entity->criteria) : array
 foreach ($criteria as $criterion) {
 	$criteria_options[$criterion] = $criterion;
 }
-$type_subtype_pairs_setting = explode(',', $entity->type_subtype_pairs);
+$type_subtype_pairs_setting = isset($entity->type_subtype_pairs) ? unserialize($entity->type_subtype_pairs) : array();
 $granular_criteria = isset($entity->granular_criteria) ? unserialize($entity->granular_criteria) : array();
 
 echo '<div>';
