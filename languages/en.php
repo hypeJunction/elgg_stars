@@ -16,12 +16,12 @@ $english = array(
 	'stars:settings:granular_criteria' => 'Rating criteria that applies to this type subtype pair',
 
 	'stars:widget:highestrating' => 'Highest Rating',
+	'stars:widget:highestrating:desc' => 'Displays content with the highest rating',
 	'stars:widget:numbertodisplay' => 'Number of items to display',
 	'stars:widget:types' => 'Rating table to display',
 	'stars:widget:types:object' => 'Most rated content',
 	'stars:widget:types:user' => 'Most rated users',
 	'stars:widget:types:group' => 'Most rated groups',
-	'stars:widget:description' => 'A list of highest rating content',
 
 	'stars:rate' => 'Rate',
     'stars:stats' => '%s/%s (%s votes)',
@@ -32,13 +32,13 @@ $english = array(
     'stars:rate:alreadyrated' => 'Sorry, you can\'t rate the same item twice',
 	'stars:delete:success' => 'Rating was successfully removed',
 	'stars:delete:error' => 'Rating could not be removed',
-	
+
 	'stars:ratings' => 'Ratings',
-	
+
 	'rating_name:starrating' => 'Rating',
 
 	'stars:river:summary' => '%s rated %s\'s %s with %s stars',
-	
+
 );
 
 add_translation("en", $english);
