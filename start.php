@@ -48,13 +48,14 @@ function elgg_stars_init() {
 	// Add an annotation view for registered ratings
 	elgg_register_plugin_hook_handler('view', 'annotation/default', 'elgg_stars_annotation_view_replacement');
 
+	// Extend the sidebar with the ratings module
+	elgg_register_plugin_hook_handler('view', 'page/elements/comments', 'elgg_stars_comments_rating_addon', 900);
+	elgg_register_plugin_hook_handler('comments', 'all', 'elgg_stars_comments_rating_addon', 900);
+	
 	// Get rating criteria that applies to an entity
 	elgg_register_plugin_hook_handler('criteria', 'stars', 'elgg_stars_rating_criteria_hook');
 
 	// Setup widgets
 	elgg_register_widget_type('highestrating', elgg_echo('stars:widget:highestrating'), elgg_echo('stars:widget:highestrating:desc'), 'all', false);
 
-	// Extend the sidebar with the ratings module
-	elgg_extend_view('page/elements/comments', 'stars/ratings');
-	
 }

@@ -40,7 +40,7 @@ echo '<label>' . elgg_echo('stars:settings:entity_ratings:extend_menu') . '</lab
 echo elgg_view('input/dropdown', array(
 	'name' => 'params[extend_menu]',
 	'value' => $entity->extend_menu,
-	'options' => array(
+	'options_values' => array(
 		0 => elgg_echo('option:no'),
 		1 => elgg_echo('option:yes')
 	)
@@ -52,7 +52,7 @@ echo '<label>' . elgg_echo('stars:settings:entity_ratings:extend_comments') . '<
 echo elgg_view('input/dropdown', array(
 	'name' => 'params[extend_comments]',
 	'value' => $entity->extend_comments,
-	'options' => array(
+	'options_values' => array(
 		0 => elgg_echo('option:no'),
 		1 => elgg_echo('option:yes')
 	)

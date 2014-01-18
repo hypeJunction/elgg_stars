@@ -3,7 +3,7 @@
 /**
  * Display a list of ratings and a ratings form
  */
-if (!elgg_get_plugin_setting('extend_comments', 'elgg_stars')) {
+if (!(bool)elgg_get_plugin_setting('extend_comments', 'elgg_stars')) {
 	return;
 }
 

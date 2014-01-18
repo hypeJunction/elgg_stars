@@ -11,7 +11,7 @@
  */
 function elgg_stars_menu_setup($hook, $type, $return, $params) {
 
-	if (!elgg_get_plugin_setting('extend_menu', 'elgg_stars')) {
+	if (!(bool)elgg_get_plugin_setting('extend_menu', 'elgg_stars')) {
 		return $return;
 	}
 
@@ -150,4 +150,17 @@ function elgg_stars_rating_criteria_hook($hook, $type, $return, $params) {
 	$granular_criteria = unserialize(elgg_get_plugin_setting('granular_criteria', 'elgg_stars'));
 
 	return $granular_criteria["$type:$subtype"];
+}
+
+/**
+ * Append the rating module to comments
+ * Note: Using a plugin hook, since some plugins overwrite the output completely
+ */
+function elgg_stars_comments_rating_addon($hook, $type, $output, $params) {
+
+	$vars = ($hook == 'view') ? elgg_extract('vars', $params) : $params;
+
+	$ratings_view = elgg_view('stars/ratings', $vars);
+
+	return $output . $ratings_view;
 }
