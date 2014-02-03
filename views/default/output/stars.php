@@ -10,6 +10,9 @@
  * @uses $vars['step'] At what step the input values are iterated
  */
 
+elgg_load_js('jquery.rateit');
+elgg_load_js('elgg.rateit');
+
 $settings = elgg_stars_get_rating_settings();
 
 $options = array(

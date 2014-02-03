@@ -36,7 +36,10 @@ function elgg_stars_init() {
 
 	// Stars JS and CSS
 	elgg_extend_view('css/elgg', 'stars/css');
-	elgg_extend_view('js/elgg', 'stars/js');
+
+	elgg_register_js('jquery.rateit', '/mod/elgg_stars/vendors/rateit/jquery.rateit.min.js', 'footer', 600);
+	elgg_register_simplecache_view('js/stars/js');
+	elgg_register_js('elgg.rateit', elgg_get_simplecache_url('js', 'stars/js'), 'footer', 700);
 
 	// Setup menus
 	elgg_register_plugin_hook_handler('register', 'menu:entity', 'elgg_stars_menu_setup');
