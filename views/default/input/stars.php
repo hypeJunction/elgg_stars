@@ -17,7 +17,7 @@ $settings = elgg_stars_get_rating_settings();
 $id = md5(microtime());
 $options = array(
 	'data-rateit-backingfld' => "#$id",
-	'data-rateit-readonly' => true,
+	'data-rateit-readonly' => false,
 	'data-rateit-resetable' => 0,
 );
 
