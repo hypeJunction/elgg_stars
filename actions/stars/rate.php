@@ -20,7 +20,13 @@ foreach ($annotation_names as $annotation_name) {
 	if ($entity->canAnnotate(0, $annotation_name) && elgg_stars_is_valid_rating($annotation_value)) {
 		$id = create_annotation($guid, $annotation_name, (float) $annotation_value, '', $owner->guid, $entity->access_id);
 		if ($id) {
-			add_to_river('stars/river/rating', "stream:rating", elgg_get_logged_in_user_guid(), $entity->guid, $entity->access_id, time(), $id);
+			elgg_create_river_item(array(
+				'view' => 'stars/river/rating',
+				'action_type' => 'stream:rating',
+				'subject_guid' => elgg_get_logged_in_user_guid(),
+				'object_guid' => $entity->guid,
+				'annotation_id' => $id,
+			));
 		} else {
 			register_error(elgg_echo('stars:rate:error'));
 		}
@@ -28,7 +34,6 @@ foreach ($annotation_names as $annotation_name) {
 
 	$entity_ratings = elgg_stars_get_entity_rating_values($entity, $annotation_name);
 	$response[$guid][$annotation_name] = $entity_ratings;
-	
 }
 
 if (elgg_is_xhr()) {

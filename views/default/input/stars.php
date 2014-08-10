@@ -1,4 +1,4 @@
-<?php
+	<?php
 
 /**
  * Star rating input view - an HTML tag back with a hidden input
@@ -11,9 +11,6 @@
  * @uses $vars['max'] Maximum input value
  * @uses $vars['step'] At what step the input values are iterated
  */
-
-elgg_load_js('jquery.rateit');
-elgg_load_js('elgg.rateit');
 
 $settings = elgg_stars_get_rating_settings();
 

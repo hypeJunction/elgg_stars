@@ -37,9 +37,12 @@ function elgg_stars_init() {
 	// Stars JS and CSS
 	elgg_extend_view('css/elgg', 'stars/css');
 
-	elgg_register_js('jquery.rateit', '/mod/elgg_stars/vendors/rateit/jquery.rateit.min.js', 'footer', 600);
-	elgg_register_simplecache_view('js/stars/js');
-	elgg_register_js('elgg.rateit', elgg_get_simplecache_url('js', 'stars/js'), 'footer', 700);
+	elgg_define_js('jquery.rateit', array(
+		'src' => '/mod/elgg_stars/vendors/rateit/jquery.rateit.min.js',
+		'deps' => array('jquery'),
+	));
+
+	elgg_require_js('stars/init');
 
 	// Setup menus
 	elgg_register_plugin_hook_handler('register', 'menu:entity', 'elgg_stars_menu_setup');
@@ -59,6 +62,6 @@ function elgg_stars_init() {
 	elgg_register_plugin_hook_handler('criteria', 'stars', 'elgg_stars_rating_criteria_hook');
 
 	// Setup widgets
-	elgg_register_widget_type('highestrating', elgg_echo('stars:widget:highestrating'), elgg_echo('stars:widget:highestrating:desc'), 'all', false);
+	elgg_register_widget_type('highestrating', elgg_echo('stars:widget:highestrating'), elgg_echo('stars:widget:highestrating:desc'), array('all'), false);
 
 }
