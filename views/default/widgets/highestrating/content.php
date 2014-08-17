@@ -62,9 +62,3 @@ foreach ($entities as $entity) {
 elgg_pop_context();
 
 echo '<ul class="elgg-list elgg-list-most-rated">' . $list . '</ul>';
-?>
-<script type="text/javascript">
-	$('.elgg-list-most-rated').ready(function() {
-		$('.rateit').rateit();
-	})
-</script>
