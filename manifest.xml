@@ -3,7 +3,7 @@
 
 	<name>Stars</name>
 	<id>elgg_stars</id>
-	<version>3.0.0.0</version>
+	<version>3.0.0.1</version>
 
     <description>Content rating modules</description>
     <category>content</category>
