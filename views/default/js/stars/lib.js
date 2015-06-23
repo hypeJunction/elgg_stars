@@ -6,7 +6,7 @@ define(['elgg', 'jquery', 'jquery.rateit'], function(elgg, $) {
 
 			$(selector).rateit();
 
-			$(document).off('rated', selector).on('rated', selector, function() {
+			$(document).off('rated', '.rateit').on('rated', '.rateit', function() {
 				var $elem = $(this);
 				var $form = $(this).closest('.elgg-form-stars-rate');
 				if (!$form.length) {
