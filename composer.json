@@ -1,0 +1,25 @@
+{
+	"name": "hypejunction/elgg_stars",
+	"type": "elgg-plugin",
+	"description": "Star rating for Elgg",
+	"homepage": "http://hypejunction.com",
+	"keywords": [
+		"elgg", "plugin", "ratings", "stars"
+	],
+	"minimum-stability" : "dev",
+	"license": "GPL-2.0",
+	"authors": [
+		{
+			"name": "Ismayil Khayredinov",
+			"email": "ismayil.khayredinov@gmail.com"
+		}
+	],
+	"config": {
+		"vendor-dir": "/vendor/"
+	},
+	"require": {
+		"php": ">=5.4",
+		"composer/installers": "1.*"
+	}
+}
+
