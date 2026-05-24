@@ -35,5 +35,13 @@
         "elgg-plugin": {
             "id": "elgg_stars"
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
 }
