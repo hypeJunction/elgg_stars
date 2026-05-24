@@ -15,10 +15,10 @@ elgg_load_js('elgg.rateit');
 
 $settings = elgg_stars_get_rating_settings();
 
-$options = array(
+$options = [
 	'data-rateit-readonly' => true,
 	'data-rateit-resetable' => 0,
-);
+];
 
 if (isset($vars['class'])) {
 	$options['class'] = "{$vars['class']} rateit";
@@ -28,7 +28,7 @@ if (isset($vars['class'])) {
 }
 
 if (isset($vars['value'])) {
-	$value = $options['data-rateit-value'] = $vars['value'];
+	$options['data-rateit-value'] = $vars['value'];
 	unset($vars['value']);
 }
 

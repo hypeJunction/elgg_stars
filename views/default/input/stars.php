@@ -1,4 +1,4 @@
-	<?php
+<?php
 
 /**
  * Star rating input view - an HTML tag back with a hidden input
@@ -14,12 +14,12 @@
 
 $settings = elgg_stars_get_rating_settings();
 
-$id = md5(microtime());
-$options = array(
+$id = 'elgg-stars-' . uniqid('', true);
+$options = [
 	'data-rateit-backingfld' => "#$id",
 	'data-rateit-readonly' => false,
 	'data-rateit-resetable' => 0,
-);
+];
 
 if (isset($vars['class'])) {
 	$options['class'] = "{$vars['class']} rateit";
@@ -29,14 +29,18 @@ if (isset($vars['class'])) {
 }
 
 if (isset($vars['name'])) {
-	$name = $options['data-annotation-name'] = $vars['name'];
+	$name = $vars['name'];
+	$options['data-annotation-name'] = $name;
 	unset($vars['name']);
 } else {
-	$name = $options['data-annotation-name'] = 'starrating';
+	$name = 'starrating';
+	$options['data-annotation-name'] = $name;
 }
 
+$value = null;
 if (isset($vars['value'])) {
-	$value = $options['data-rateit-value'] = $vars['value'];
+	$value = $vars['value'];
+	$options['data-rateit-value'] = $value;
 	unset($vars['value']);
 }
 
@@ -70,8 +74,8 @@ $options = array_merge($vars, $options);
 $attrs = elgg_format_attributes($options);
 
 echo "<div $attrs></div>";
-echo elgg_view('input/hidden', array(
+echo elgg_view('input/hidden', [
 	'id' => $id,
 	'name' => $name,
 	'value' => $value,
-));
+]);

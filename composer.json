@@ -1,25 +1,38 @@
 {
 	"name": "hypejunction/elgg_stars",
+	"description": "Star rating widget for any Elgg entity — annotate, aggregate, and display.",
 	"type": "elgg-plugin",
-	"description": "Star rating for Elgg",
-	"homepage": "http://hypejunction.com",
 	"keywords": [
-		"elgg", "plugin", "ratings", "stars"
+		"elgg",
+		"plugin",
+		"ratings",
+		"stars"
 	],
-	"minimum-stability" : "dev",
-	"license": "GPL-2.0",
+	"license": "GPL-2.0-or-later",
 	"authors": [
 		{
 			"name": "Ismayil Khayredinov",
 			"email": "ismayil.khayredinov@gmail.com"
 		}
 	],
-	"config": {
-		"vendor-dir": "/vendor/"
-	},
 	"require": {
-		"php": ">=5.4",
-		"composer/installers": "1.*"
+		"php": ">=7.0",
+		"composer/installers": "~1.0",
+		"elgg/elgg": "^3.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"ElggStars\\": "classes/ElggStars/"
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		}
+	},
+	"extra": {
+		"elgg-plugin": {
+			"id": "elgg_stars"
+		}
 	}
 }
-

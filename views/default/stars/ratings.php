@@ -3,7 +3,7 @@
 /**
  * Display a list of ratings and a ratings form
  */
-if (!(bool)elgg_get_plugin_setting('extend_comments', 'elgg_stars')) {
+if (!(bool) elgg_get_plugin_setting('extend_comments', 'elgg_stars')) {
 	return;
 }
 
@@ -27,30 +27,30 @@ if ($subtype && array_search($subtype, $type_subtype_pairs[$type]) === false) {
 }
 
 if ($show_add_form) {
-	$body .= elgg_view_form('stars/rate', array(), array(
+	$body .= elgg_view_form('stars/rate', [], [
 		'entity' => $entity
-	));
+	]);
 }
 
 $title = elgg_echo('stars:ratings');
 
 $annotation_names = elgg_stars_get_rating_annotation_names($entity);
 
-$body .= elgg_list_annotations(array(
+$body .= elgg_list_annotations([
 	'guid' => $entity->guid,
 	'annotation_names' => $annotation_names,
-		));
+]);
 
 $entity_ratings = elgg_stars_get_entity_rating_values($entity, $annotation_names);
 
 $label = '<label>' . elgg_echo('stars:stats:totals') . '</label>';
-$total = elgg_view('output/stars', array('value' => $entity_ratings['value']));
-$stats = elgg_echo('stars:stats', array($entity_ratings['value'], $entity_ratings['max'], $entity_ratings['count']));
+$total = elgg_view('output/stars', ['value' => $entity_ratings['value']]);
+$stats = elgg_echo('stars:stats', [$entity_ratings['value'], $entity_ratings['max'], $entity_ratings['count']]);
 
-$footer = elgg_view_image_block($label, $total, array(
+$footer = elgg_view_image_block($label, $total, [
 	'image_alt' => $stats
-		));
+]);
 
-echo elgg_view_module('aside', $title, $body, array(
+echo elgg_view_module('aside', $title, $body, [
 	'footer' => $footer
-));
+]);

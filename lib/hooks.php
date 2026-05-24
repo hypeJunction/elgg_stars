@@ -3,15 +3,15 @@
 /**
  * Add starrating menu items to rateable entities
  *
- * @param string $hook Equals 'register'
- * @param string $type Equals 'menu:entity' or 'menu:title'
- * @param array $return Current menu items
- * @param array $params Additional params
+ * @param string $hook   Equals 'register'
+ * @param string $type   Equals 'menu:entity' or 'menu:title'
+ * @param array  $return Current menu items
+ * @param array  $params Additional params
  * @return array Update menu items
  */
 function elgg_stars_menu_setup($hook, $type, $return, $params) {
 
-	if (!(bool)elgg_get_plugin_setting('extend_menu', 'elgg_stars')) {
+	if (!(bool) elgg_get_plugin_setting('extend_menu', 'elgg_stars')) {
 		return $return;
 	}
 
@@ -32,26 +32,27 @@ function elgg_stars_menu_setup($hook, $type, $return, $params) {
 		return $return;
 	}
 
-	$starrating = array(
+	$starrating = [
 		'name' => 'stars',
 		'priority' => 10,
-		'text' => elgg_view_form('stars/rate', array(), $params),
+		'text' => elgg_view_form('stars/rate', [], $params),
 		'href' => false,
 		'encode_text' => false,
 		'section' => 'rating'
-	);
+	];
 	$return[] = ElggMenuItem::factory($starrating);
 
 	return $return;
 }
 
 /**
- * Setup starrating annotation menu
- * 
- * @param type $hook
- * @param type $type
- * @param type $return
- * @param type $params
+ * Setup starrating annotation menu.
+ *
+ * @param string $hook   Equals 'register'
+ * @param string $type   Equals 'menu:annotation'
+ * @param array  $return Current menu items
+ * @param array  $params Additional params (includes 'annotation')
+ * @return array Updated menu items
  */
 function elgg_stars_annotation_menu_setup($hook, $type, $return, $params) {
 
@@ -62,12 +63,12 @@ function elgg_stars_annotation_menu_setup($hook, $type, $return, $params) {
 	}
 
 	if ($annotation->canEdit()) {
-		$return[] = ElggMenuItem::factory(array(
+		$return[] = ElggMenuItem::factory([
 			'name' => 'delete',
 			'text' => elgg_view_icon('delete'),
 			'href' => 'action/stars/delete?annotation_id=' . $annotation->id,
 			'is_action' => true
-		));
+		]);
 	}
 
 	return $return;
@@ -76,10 +77,10 @@ function elgg_stars_annotation_menu_setup($hook, $type, $return, $params) {
 /**
  * Check if the user can rate this entity with a given annotation name
  *
- * @param string $hook Equals 'permissions_check:annotate'
- * @param string $type Any entity type
+ * @param string  $hook   Equals 'permissions_check:annotate'
+ * @param string  $type   Any entity type
  * @param boolean $return Current permission
- * @param array $params Additional params
+ * @param array   $params Additional params
  * @return boolean Updated permission
  */
 function elgg_stars_can_annotate($hook, $type, $return, $params) {
@@ -102,10 +103,10 @@ function elgg_stars_can_annotate($hook, $type, $return, $params) {
 /**
  * Replace default annotation view with a starrating annotation view for registered rating annotation names
  *
- * @param string $hook Equals 'view'
- * @param string $type Equals 'annotation/default'
+ * @param string $hook   Equals 'view'
+ * @param string $type   Equals 'annotation/default'
  * @param string $return Current view
- * @param array $params Additional params
+ * @param array  $params Additional params
  * @return string
  */
 function elgg_stars_annotation_view_replacement($hook, $type, $return, $params) {
@@ -127,10 +128,10 @@ function elgg_stars_annotation_view_replacement($hook, $type, $return, $params) 
 /**
  * Apply plugins settings to entity ratings criteria
  *
- * @param string $hook Equals 'criteria'
- * @param string $type Equals 'stars'
- * @param array $return Current list of criteria
- * @param array $params Additional params
+ * @param string $hook   Equals 'criteria'
+ * @param string $type   Equals 'stars'
+ * @param array  $return Current list of criteria
+ * @param array  $params Additional params
  * @return array Updated list of criteria
  */
 function elgg_stars_rating_criteria_hook($hook, $type, $return, $params) {
@@ -147,14 +148,25 @@ function elgg_stars_rating_criteria_hook($hook, $type, $return, $params) {
 		$subtype = 'default';
 	}
 
-	$granular_criteria = unserialize(elgg_get_plugin_setting('granular_criteria', 'elgg_stars'));
+	$granular_criteria = elgg_stars_decode_setting(elgg_get_plugin_setting('granular_criteria', 'elgg_stars'));
+
+	if (!is_array($granular_criteria) || !isset($granular_criteria["$type:$subtype"])) {
+		return $return;
+	}
 
 	return $granular_criteria["$type:$subtype"];
 }
 
 /**
- * Append the rating module to comments
- * Note: Using a plugin hook, since some plugins overwrite the output completely
+ * Append the rating module to comments.
+ *
+ * Note: Using a plugin hook, since some plugins overwrite the output completely.
+ *
+ * @param string $hook   Hook name ('view' or 'comments')
+ * @param string $type   Hook type
+ * @param string $output Current output / value
+ * @param array  $params Additional params
+ * @return string Augmented output
  */
 function elgg_stars_comments_rating_addon($hook, $type, $output, $params) {
 

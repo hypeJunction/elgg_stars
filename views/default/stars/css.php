@@ -6,7 +6,9 @@ $star_url = elgg_normalize_url('mod/elgg_stars/vendors/rateit/star.gif');
 $del_url = elgg_normalize_url('mod/elgg_stars/vendors/rateit/delete.gif');
 ?>
 
-<?php if (false) : ?><style type="text/css"><?php endif; ?>
+<?php if (false) :
+	?><style type="text/css"><?php
+endif; ?>
 
 	.rateit {
 		display: -moz-inline-box;
@@ -131,4 +133,6 @@ $del_url = elgg_normalize_url('mod/elgg_stars/vendors/rateit/delete.gif');
 		text-align: center;
 	}
 	
-	<?php if (false) : ?></style><?php endif; ?>
+	<?php if (false) :
+		?></style><?php
+	endif; ?>

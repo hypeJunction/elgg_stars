@@ -10,23 +10,24 @@ function elgg_stars_get_rating_settings() {
 	$max = elgg_get_plugin_setting('max_value', 'elgg_stars');
 	$step = elgg_get_plugin_setting('step', 'elgg_stars');
 
-	return array(
+	return [
 		'min' => $min,
 		'max' => $max,
 		'step' => $step
-	);
+	];
 }
 
 /**
- * Add an annotation name to a list of valid rating names
- * 
- * @param string $annotation_name
+ * Add an annotation name to a list of valid rating names.
+ *
+ * @param string $annotation_name Annotation name to register
+ * @return void
  */
 function elgg_stars_register_rating_annotation_name($annotation_name) {
 
 	$rating_annotation_names = elgg_get_config('elgg_stars_annotation_names');
 	if (!is_array($rating_annotation_names)) {
-		$rating_annotation_names = array();
+		$rating_annotation_names = [];
 	}
 
 	if (!in_array($annotation_name, $rating_annotation_names)) {
@@ -37,26 +38,25 @@ function elgg_stars_register_rating_annotation_name($annotation_name) {
 }
 
 /**
- * Get registered rating annotation names for a given type and subtype
+ * Get registered rating annotation names for a given entity.
  *
- * @param string $type Entity type
- * @param string $subtype Entity subtype
+ * @param \ElggEntity|null $entity Entity to scope annotation names to, or null for global
  * @return array
  */
 function elgg_stars_get_rating_annotation_names($entity = null) {
 
 	$rating_annotation_names = elgg_get_config('elgg_stars_annotation_names');
 	if (!is_array($rating_annotation_names)) {
-		$rating_annotation_names = array();
+		$rating_annotation_names = [];
 	}
 
-	return elgg_trigger_plugin_hook('criteria', 'stars', array('entity' => $entity) , $rating_annotation_names);
+	return elgg_trigger_plugin_hook('criteria', 'stars', ['entity' => $entity], $rating_annotation_names);
 }
 
 /**
- * Check if the annotation name has been registered as a rating name
+ * Check if the annotation name has been registered as a rating name.
  *
- * @param string $annotation_name
+ * @param string $annotation_name Annotation name to check
  * @return boolean
  */
 function elgg_stars_is_valid_rating_annotation_name($annotation_name) {
@@ -77,9 +77,9 @@ function elgg_stars_is_valid_rating_annotation_name($annotation_name) {
 /**
  * Calculate entity rating values for a given annotation name
  *
- * @param ElggEntity $entity
- * @param mixed $annotation_names One or more annotation names
- * @return int|boolean
+ * @param \ElggEntity $entity           Entity being rated
+ * @param mixed       $annotation_names One or more annotation names (or null for all registered)
+ * @return array|boolean Array of rating stats, or false if entity is invalid
  */
 function elgg_stars_get_entity_rating_values($entity, $annotation_names = null) {
 
@@ -93,18 +93,18 @@ function elgg_stars_get_entity_rating_values($entity, $annotation_names = null) 
 
 	$settings = elgg_stars_get_rating_settings();
 
-	$count = elgg_get_annotations(array(
+	$count = elgg_get_annotations([
 		'guid' => $entity->guid,
 		'annotation_names' => $annotation_names,
 		'count' => true
-	));
+	]);
 
 	if ($count > 0) {
-		$sum = elgg_get_annotations(array(
+		$sum = elgg_get_annotations([
 			'guid' => $entity->guid,
 			'annotation_names' => $annotation_names,
 			'annotation_calculation' => 'sum'
-		));
+		]);
 
 		$average = $sum / $count;
 		$average_rounded = round($average, 2);
@@ -113,24 +113,24 @@ function elgg_stars_get_entity_rating_values($entity, $annotation_names = null) 
 		$average_rounded = $settings['min'];
 	}
 
-	$stats = array(
+	$stats = [
 		'count' => $count,
 		'sum' => $sum,
 		'value' => $average_rounded,
-	);
+	];
 
 	$values = $stats + $settings;
 
-	return elgg_trigger_plugin_hook('rating', 'stars', array('entity' => $entity), $values);
+	return elgg_trigger_plugin_hook('rating', 'stars', ['entity' => $entity], $values);
 }
 
 /**
- * Check if the user has casted a vote on a given entity with a given annotation name
+ * Check whether the user has cast a vote on a given entity for any of the supplied annotation names.
  *
- * @param ElggEntity $entity
- * @param ElggUser $user
- * @param string $annotation_name
- * @return false|array
+ * @param \ElggEntity     $entity           Entity being rated
+ * @param \ElggUser|null  $user             User to check (defaults to logged-in user)
+ * @param string|string[] $annotation_names Annotation name(s) to look for
+ * @return boolean
  */
 function elgg_stars_has_user_voted($entity, $user = null, $annotation_names = null) {
 
@@ -146,20 +146,20 @@ function elgg_stars_has_user_voted($entity, $user = null, $annotation_names = nu
 		$annotation_names = elgg_stars_get_rating_annotation_names($entity);
 	}
 
-	$votes = elgg_get_annotations(array(
+	$votes = elgg_get_annotations([
 		'annotation_names' => $annotation_names,
 		'guids' => $entity->guid,
 		'annotation_owner_guids' => $user->guid,
 		'count' => true
-	));
+	]);
 
 	return ((int) $votes > 0);
 }
 
 /**
- * Check if annotation value is in acceptable range
+ * Check if annotation value is in acceptable range.
  *
- * @param float $val
+ * @param float $val Rating value
  * @return boolean
  */
 function elgg_stars_is_valid_rating($val) {
@@ -176,21 +176,59 @@ function elgg_stars_is_valid_rating($val) {
 function elgg_stars_get_rateable_type_subtype_pairs() {
 
 	$setting = elgg_get_plugin_setting('type_subtype_pairs', 'elgg_stars');
-	$type_subtype_pairs = array('object' => array());
+	$type_subtype_pairs = ['object' => []];
 
 	if ($setting) {
-		$setting = unserialize($setting);
+		$setting = elgg_stars_decode_setting($setting);
 		if (is_array($setting)) {
 			foreach ($setting as $s) {
 				list($type, $subtype) = explode(':', $s);
 				if (!isset($type_subtype_pairs[$type])) {
-					$type_subtype_pairs[$type] = array();
+					$type_subtype_pairs[$type] = [];
 				}
+
 				if ($subtype != 'default') {
 					$type_subtype_pairs[$type][] = $subtype;
 				}
 			}
 		}
 	}
+
 	return $type_subtype_pairs;
 }
+
+/**
+ * Encode a setting value for storage as JSON.
+ *
+ * @param mixed $value Value to encode
+ * @return string JSON-encoded value
+ */
+function elgg_stars_encode_setting($value) {
+	return json_encode($value);
+}
+
+/**
+ * Decode a stored setting value.
+ *
+ * Accepts JSON (preferred, post-3.0) and legacy PHP-serialized payloads
+ * (pre-3.0 data) so existing sites continue to work until the upgrade
+ * batch runs.
+ *
+ * @param string $value Stored setting value
+ * @return mixed Decoded value, or null when the payload is unreadable
+ */
+function elgg_stars_decode_setting($value) {
+	if (!is_string($value) || $value === '') {
+		return null;
+	}
+
+	$decoded = json_decode($value, true);
+	if ($decoded !== null || $value === 'null') {
+		return $decoded;
+	}
+
+	// Legacy PHP-serialized payload — disallow object instantiation.
+	$legacy = @unserialize($value, ['allowed_classes' => false]);
+	return $legacy === false && $value !== 'b:0;' ? null : $legacy;
+}
+

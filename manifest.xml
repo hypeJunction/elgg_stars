@@ -3,20 +3,20 @@
 
 	<name>Stars</name>
 	<id>elgg_stars</id>
-	<version>3.1.0</version>
+	<version>3.0.0</version>
 
-    <description>Content rating modules</description>
+    <description>Star rating widget for any Elgg entity — annotate, aggregate, and display.</description>
     <category>content</category>
 	<category>rating</category>
 
-	<author>Ismayil Khayredinov (ismayil.khayredinov@gmail.com)</author>
-    <website>http://hypeJunction.com</website>
-    <copyright>2011-2014 (c) Ismayil Khayredinov</copyright>
+	<author>hypeJunction</author>
+    <website>https://github.com/hypeJunction/elgg_stars</website>
+    <copyright>2011-2026 hypeJunction</copyright>
     <license>GNU Public License version 2</license>
 
 	<requires>
         <type>elgg_release</type>
-		<version>1.9</version>
+		<version>3.0</version>
     </requires>
 
 </plugin_manifest>

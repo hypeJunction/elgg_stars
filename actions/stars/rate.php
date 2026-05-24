@@ -14,19 +14,18 @@ $owner = elgg_get_logged_in_user_entity();
 $annotation_names = get_input('annotation_names');
 
 foreach ($annotation_names as $annotation_name) {
-
 	$annotation_value = get_input($annotation_name);
 
 	if ($entity->canAnnotate(0, $annotation_name) && elgg_stars_is_valid_rating($annotation_value)) {
 		$id = create_annotation($guid, $annotation_name, (float) $annotation_value, '', $owner->guid, $entity->access_id);
 		if ($id) {
-			elgg_create_river_item(array(
+			elgg_create_river_item([
 				'view' => 'stars/river/rating',
 				'action_type' => 'stream:rating',
 				'subject_guid' => elgg_get_logged_in_user_guid(),
 				'object_guid' => $entity->guid,
 				'annotation_id' => $id,
-			));
+			]);
 		} else {
 			register_error(elgg_echo('stars:rate:error'));
 		}

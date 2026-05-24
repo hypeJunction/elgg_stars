@@ -25,7 +25,6 @@ define(['elgg', 'jquery', 'jquery.rateit'], function(elgg, $) {
 					},
 					success: function(data) {
 						if (data && data.output) {
-
 							values = data.output[guid][annotation_name];
 							$starinput.rateit('readonly', true);
 							$starinput.rateit('value', values.value);
