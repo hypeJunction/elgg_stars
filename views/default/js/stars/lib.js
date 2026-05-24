@@ -28,7 +28,7 @@ define(['elgg', 'jquery', 'jquery.rateit'], function(elgg, $) {
 							values = data.output[guid][annotation_name];
 							$starinput.rateit('readonly', true);
 							$starinput.rateit('value', values.value);
-							$caption.text(elgg.echo('stars:stats', [values.value, values.max, values.count]));
+							$caption.text(i18n.echo('stars:stats', [values.value, values.max, values.count]));
 						} else {
 							$starinput.rateit('readonly', false);
 						}

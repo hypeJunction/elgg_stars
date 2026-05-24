@@ -81,7 +81,7 @@
 
                 //if readonly now and it wasn't readonly, remove the eventhandlers.
                 if (p1 == 'readonly' && p2 == true && !itemdata('readonly')) {
-                    item.find('.rateit-range').unbind();
+                    item.find('.rateit-range').off();
                     itemdata('wired', false);
                 }
                 //when we receive a null value, reset the score to its min value.
@@ -180,7 +180,7 @@
             //setup the reset button
             var resetbtn = item.find('.rateit-reset');
             if (resetbtn.data('wired') !== true) {
-                resetbtn.bind('click', function (e) {
+                resetbtn.on('click', function (e) {
                     e.preventDefault();
                     resetbtn.blur();
                     item.rateit('value', null);
@@ -236,7 +236,7 @@
 
                 //when the mouse goes over the range element, we set the "hover" stars.
                 if (!itemdata('wired')) {
-                    range.bind('touchmove touchend', touchHandler); //bind touch events
+                    range.on('touchmove touchend', touchHandler); //bind touch events
                     range.mousemove(function (e) {
                         var score = calcRawScore(this, e);
                         setHover(score);

@@ -5,10 +5,10 @@ if (elgg_in_context('profile') || elgg_in_context('groups')) {
 	$page_owner = elgg_get_page_owner_entity();
 }
 
-if (elgg_instanceof($page_owner, 'user')) {
+if ($page_owner instanceof \ElggUser) {
 	$owner_guid = $page_owner->guid;
 	$container_guid = ELGG_ENTITIES_ANY_VALUE;
-} else if (elgg_instanceof($page_owner, 'group')) {
+} else if ($page_owner instanceof \ElggGroup) {
 	$owner_guid = ELGG_ENTITIES_ANY_VALUE;
 	$container_guid = $page_owner->guid;
 } else {
