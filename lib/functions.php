@@ -50,7 +50,7 @@ function elgg_stars_get_rating_annotation_names($entity = null) {
 		$rating_annotation_names = [];
 	}
 
-	return elgg_trigger_plugin_hook('criteria', 'stars', ['entity' => $entity], $rating_annotation_names);
+	return elgg_trigger_event_results('criteria', 'stars', ['entity' => $entity], $rating_annotation_names);
 }
 
 /**
@@ -121,7 +121,7 @@ function elgg_stars_get_entity_rating_values($entity, $annotation_names = null) 
 
 	$values = $stats + $settings;
 
-	return elgg_trigger_plugin_hook('rating', 'stars', ['entity' => $entity], $values);
+	return elgg_trigger_event_results('rating', 'stars', ['entity' => $entity], $values);
 }
 
 /**

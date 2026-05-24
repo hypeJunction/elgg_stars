@@ -1,14 +1,12 @@
 <?php
 
 use ElggStars\Bootstrap;
-use ElggStars\Hooks;
-use ElggStars\Menus;
 use ElggStars\Upgrades\EncodeSettingsAsJson;
 
 return [
 	'plugin' => [
 		'name' => 'Stars',
-		'version' => '4.0.0',
+		'version' => '5.0.0',
 	],
 	'bootstrap' => Bootstrap::class,
 	'settings' => [
@@ -29,36 +27,36 @@ return [
 			'multiple' => false,
 		],
 	],
-	'hooks' => [
+	'events' => [
 		'register' => [
 			'menu:entity' => [
-				Menus::class . '::entityMenu' => [],
+				'ElggStars\Menus::entityMenu' => [],
 			],
 			'menu:annotation' => [
-				Menus::class . '::annotationMenu' => [],
+				'ElggStars\Menus::annotationMenu' => [],
 			],
 		],
 		'permissions_check:annotate' => [
 			'all' => [
-				Hooks::class . '::canAnnotate' => [],
+				'ElggStars\Events::canAnnotate' => [],
 			],
 		],
 		'view' => [
 			'annotation/default' => [
-				Hooks::class . '::annotationViewReplacement' => [],
+				'ElggStars\Events::annotationViewReplacement' => [],
 			],
 			'page/elements/comments' => [
-				Hooks::class . '::commentsRatingAddon' => ['priority' => 900],
+				'ElggStars\Events::commentsRatingAddon' => ['priority' => 900],
 			],
 		],
 		'comments' => [
 			'all' => [
-				Hooks::class . '::commentsRatingAddon' => ['priority' => 900],
+				'ElggStars\Events::commentsRatingAddon' => ['priority' => 900],
 			],
 		],
 		'criteria' => [
 			'stars' => [
-				Hooks::class . '::criteria' => [],
+				'ElggStars\Events::criteria' => [],
 			],
 		],
 	],

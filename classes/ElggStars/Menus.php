@@ -2,30 +2,30 @@
 
 namespace ElggStars;
 
-use Elgg\Hook;
+use Elgg\Event;
 use ElggMenuItem;
 
 /**
  * Menu registration handlers for elgg_stars.
  *
- * Registered via elgg-plugin.php with the 4.x single-argument signature.
+ * Registered via elgg-plugin.php with the 5.x single-argument signature.
  */
 class Menus {
 
 	/**
 	 * Append the rating widget to entity / title menus on rateable entities.
 	 *
-	 * @param \Elgg\Hook $hook 'register','menu:entity'
+	 * @param \Elgg\Event $event 'register','menu:entity'
 	 * @return array Updated menu items
 	 */
-	public static function entityMenu(Hook $hook) {
-		$return = $hook->getValue();
+	public static function entityMenu(Event $event) {
+		$return = $event->getValue();
 
 		if (!(bool) elgg_get_plugin_setting('extend_menu', 'elgg_stars')) {
 			return $return;
 		}
 
-		$entity = $hook->getParam('entity');
+		$entity = $event->getParam('entity');
 		if (!$entity instanceof \ElggEntity) {
 			return $return;
 		}
@@ -45,7 +45,7 @@ class Menus {
 		$starrating = [
 			'name' => 'stars',
 			'priority' => 10,
-			'text' => elgg_view_form('stars/rate', [], $hook->getParams()),
+			'text' => elgg_view_form('stars/rate', [], $event->getParams()),
 			'href' => false,
 			'encode_text' => false,
 			'section' => 'rating',
@@ -59,12 +59,12 @@ class Menus {
 	/**
 	 * Add a delete-rating item to the annotation menu for owners.
 	 *
-	 * @param \Elgg\Hook $hook 'register','menu:annotation'
+	 * @param \Elgg\Event $event 'register','menu:annotation'
 	 * @return array Updated menu items
 	 */
-	public static function annotationMenu(Hook $hook) {
-		$return = $hook->getValue();
-		$annotation = $hook->getParam('annotation');
+	public static function annotationMenu(Event $event) {
+		$return = $event->getValue();
+		$annotation = $event->getParam('annotation');
 
 		if (!$annotation instanceof \ElggAnnotation) {
 			return $return;

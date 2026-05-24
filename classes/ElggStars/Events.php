@@ -2,26 +2,27 @@
 
 namespace ElggStars;
 
-use Elgg\Hook;
+use Elgg\Event;
 
 /**
- * Plugin-hook handlers for elgg_stars.
+ * Event handlers for elgg_stars.
  *
- * Registered via elgg-plugin.php with the 4.x single-argument signature.
+ * Registered via elgg-plugin.php with the 5.x single-argument signature.
+ * (Hooks and events were unified in Elgg 5.x — same shape, new type hint.)
  */
-class Hooks {
+class Events {
 
 	/**
 	 * Block double-voting on rateable entities.
 	 *
-	 * @param \Elgg\Hook $hook 'permissions_check:annotate','all'
+	 * @param \Elgg\Event $event 'permissions_check:annotate','all'
 	 * @return bool Updated permission
 	 */
-	public static function canAnnotate(Hook $hook) {
-		$return = $hook->getValue();
-		$entity = $hook->getParam('entity');
-		$user = $hook->getParam('user');
-		$annotation_name = $hook->getParam('annotation_name');
+	public static function canAnnotate(Event $event) {
+		$return = $event->getValue();
+		$entity = $event->getParam('entity');
+		$user = $event->getParam('user');
+		$annotation_name = $event->getParam('annotation_name');
 
 		if (!elgg_stars_is_valid_rating_annotation_name($annotation_name)) {
 			return $return;
@@ -38,12 +39,12 @@ class Hooks {
 	 * Replace the default annotation view with a starrating view
 	 * for registered rating annotation names.
 	 *
-	 * @param \Elgg\Hook $hook 'view','annotation/default'
+	 * @param \Elgg\Event $event 'view','annotation/default'
 	 * @return string Rendered view
 	 */
-	public static function annotationViewReplacement(Hook $hook) {
-		$return = $hook->getValue();
-		$vars = $hook->getParam('vars');
+	public static function annotationViewReplacement(Event $event) {
+		$return = $event->getValue();
+		$vars = $event->getParam('vars');
 		$annotation = elgg_extract('annotation', $vars);
 
 		if (!$annotation instanceof \ElggAnnotation) {
@@ -60,12 +61,12 @@ class Hooks {
 	/**
 	 * Apply granular per-type/subtype criteria from plugin settings.
 	 *
-	 * @param \Elgg\Hook $hook 'criteria','stars'
+	 * @param \Elgg\Event $event 'criteria','stars'
 	 * @return array Updated criteria list
 	 */
-	public static function criteria(Hook $hook) {
-		$return = $hook->getValue();
-		$entity = $hook->getParam('entity');
+	public static function criteria(Event $event) {
+		$return = $event->getValue();
+		$entity = $event->getParam('entity');
 
 		if (!$entity instanceof \ElggEntity) {
 			return $return;
@@ -87,14 +88,14 @@ class Hooks {
 	}
 
 	/**
-	 * Append the ratings module to comments output (view extension via hook).
+	 * Append the ratings module to comments output (view extension via event).
 	 *
-	 * @param \Elgg\Hook $hook 'view','page/elements/comments' OR 'comments','all'
+	 * @param \Elgg\Event $event 'view','page/elements/comments' OR 'comments','all'
 	 * @return string Augmented output
 	 */
-	public static function commentsRatingAddon(Hook $hook) {
-		$output = $hook->getValue();
-		$vars = ($hook->getName() === 'view') ? $hook->getParam('vars') : $hook->getParams();
+	public static function commentsRatingAddon(Event $event) {
+		$output = $event->getValue();
+		$vars = ($event->getName() === 'view') ? $event->getParam('vars') : $event->getParams();
 
 		$ratings_view = elgg_view('stars/ratings', $vars);
 
