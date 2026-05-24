@@ -42,12 +42,10 @@ foreach ($annotation_names as $annotation_name) {
 	$caption_attrs = [
 		'class' => 'elgg-stars-rating-caption',
 		'data-guid' => $entity->guid,
-		'data-annotation-name' => $annotation_name
+		'data-annotation-name' => $annotation_name,
 	];
 
-	$caption_attrs_str = elgg_format_attributes($caption_attrs);
-
-	$body .= "<div $caption_attrs_str>" . elgg_echo('stars:stats', [$options['value'], $options['max'], $options['count']]) . '</div>';
+	$body .= elgg_format_element('div', $caption_attrs, elgg_echo('stars:stats', [$options['value'], $options['max'], $options['count']]));
 
 	$body .= elgg_view('input/hidden', [
 		'name' => 'annotation_names[]',

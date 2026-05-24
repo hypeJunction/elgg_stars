@@ -71,9 +71,8 @@ if (isset($vars['step'])) {
 }
 
 $options = array_merge($vars, $options);
-$attrs = elgg_format_attributes($options);
 
-echo "<div $attrs></div>";
+echo elgg_format_element('div', $options);
 echo elgg_view('input/hidden', [
 	'id' => $id,
 	'name' => $name,
