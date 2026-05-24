@@ -1,30 +1,23 @@
 <?php
 
-$params = get_input('params');
-$plugin_id = get_input('plugin_id');
+$params = (array) get_input('params');
+$plugin_id = (string) get_input('plugin_id');
 $plugin = elgg_get_plugin_from_id($plugin_id);
 
 if (!($plugin instanceof ElggPlugin)) {
-	register_error(elgg_echo('plugins:settings:save:fail', [$plugin_id]));
-	forward(REFERER);
+	return elgg_error_response(elgg_echo('plugins:settings:save:fail', [$plugin_id]));
 }
 
-$plugin_name = $plugin->getManifest()->getName();
-
-$result = false;
+$plugin_name = $plugin->getDisplayName();
 
 foreach ($params as $k => $v) {
 	if (is_array($v)) {
 		$v = elgg_stars_encode_setting($v);
 	}
 
-	$result = $plugin->setSetting($k, $v);
-	if (!$result) {
-		register_error(elgg_echo('plugins:settings:save:fail', [$plugin_name]));
-		forward(REFERER);
-		exit;
+	if (!$plugin->setSetting($k, $v)) {
+		return elgg_error_response(elgg_echo('plugins:settings:save:fail', [$plugin_name]));
 	}
 }
 
-system_message(elgg_echo('plugins:settings:save:ok', [$plugin_name]));
-forward(REFERER);
+return elgg_ok_response('', elgg_echo('plugins:settings:save:ok', [$plugin_name]));

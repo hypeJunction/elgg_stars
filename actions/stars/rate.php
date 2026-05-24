@@ -1,23 +1,28 @@
 <?php
 
-$guid = get_input('guid', false);
+$guid = (int) get_input('guid');
 $entity = get_entity($guid);
 
-if (!elgg_instanceof($entity)) {
-	register_error(elgg_echo('stars:rate:error'));
-	forward(REFERER);
+if (!$entity instanceof ElggEntity) {
+	return elgg_error_response(elgg_echo('stars:rate:error'));
 }
 
-
 $owner = elgg_get_logged_in_user_entity();
+$annotation_names = (array) get_input('annotation_names', []);
 
-$annotation_names = get_input('annotation_names');
+$response = [];
 
 foreach ($annotation_names as $annotation_name) {
 	$annotation_value = get_input($annotation_name);
 
 	if ($entity->canAnnotate(0, $annotation_name) && elgg_stars_is_valid_rating($annotation_value)) {
-		$id = create_annotation($guid, $annotation_name, (float) $annotation_value, '', $owner->guid, $entity->access_id);
+		$id = $entity->annotate(
+			$annotation_name,
+			(float) $annotation_value,
+			$entity->access_id,
+			$owner->guid
+		);
+
 		if ($id) {
 			elgg_create_river_item([
 				'view' => 'stars/river/rating',
@@ -27,7 +32,7 @@ foreach ($annotation_names as $annotation_name) {
 				'annotation_id' => $id,
 			]);
 		} else {
-			register_error(elgg_echo('stars:rate:error'));
+			return elgg_error_response(elgg_echo('stars:rate:error'));
 		}
 	}
 
@@ -35,9 +40,4 @@ foreach ($annotation_names as $annotation_name) {
 	$response[$guid][$annotation_name] = $entity_ratings;
 }
 
-if (elgg_is_xhr()) {
-	system_message(elgg_echo('stars:rate:success'));
-	print(json_encode($response));
-}
-
-forward(REFERER);
+return elgg_ok_response($response, elgg_echo('stars:rate:success'));

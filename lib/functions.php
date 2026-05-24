@@ -83,7 +83,7 @@ function elgg_stars_is_valid_rating_annotation_name($annotation_name) {
  */
 function elgg_stars_get_entity_rating_values($entity, $annotation_names = null) {
 
-	if (!elgg_instanceof($entity)) {
+	if (!$entity instanceof \ElggEntity) {
 		return false;
 	}
 
@@ -138,7 +138,7 @@ function elgg_stars_has_user_voted($entity, $user = null, $annotation_names = nu
 		$user = elgg_get_logged_in_user_entity();
 	}
 
-	if (!elgg_instanceof($user)) {
+	if (!$user instanceof \ElggUser) {
 		return false;
 	}
 

@@ -6,7 +6,7 @@
 $entity = elgg_extract('entity', $vars, false);
 $annotation_names = elgg_extract('annotation_names', $vars);
 
-if (!elgg_instanceof($entity)) {
+if (!$entity instanceof \ElggEntity) {
 	return;
 }
 

@@ -10,7 +10,7 @@ if (!(bool) elgg_get_plugin_setting('extend_comments', 'elgg_stars')) {
 $entity = elgg_extract('entity', $vars);
 $show_add_form = elgg_extract('show_add_form', $vars, true);
 
-if (!elgg_instanceof($entity)) {
+if (!$entity instanceof \ElggEntity) {
 	return;
 }
 
