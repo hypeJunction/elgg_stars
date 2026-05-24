@@ -3,7 +3,7 @@
 ## Summary
 
 **Name**: elgg_stars (Stars)
-**Version**: 4.0.0 — migrated to Elgg 4.x on 2026-05-24
+**Version**: 5.0.0 — migrated to Elgg 5.x on 2026-05-24
 **Purpose**: Star rating widget for Elgg entities.
 
 elgg_stars annotates Elgg objects (and any registered type/subtype pair) with
@@ -15,13 +15,13 @@ load-bearing for downstream consumers (bodyology_library, bodyology_feedback).
 
 ```
 elgg_stars/
-├── elgg-plugin.php           # Declarative plugin manifest (plugin, bootstrap, actions, widgets, hooks, settings, upgrades)
-├── composer.json             # Plugin metadata; elgg/elgg ^4.0, php >=7.4
+├── elgg-plugin.php           # Declarative plugin manifest (plugin, bootstrap, actions, widgets, events, settings, upgrades)
+├── composer.json             # Plugin metadata; elgg/elgg ~5.1.0, php >=8.1
 ├── classes/
 │   └── ElggStars/
 │       ├── Bootstrap.php     # \Elgg\PluginBootstrap — load(), init(), activate()
-│       ├── Hooks.php         # \Elgg\Hook handlers (permissions, view replacement, criteria, comments addon)
-│       ├── Menus.php         # menu:entity / menu:annotation registrations
+│       ├── Events.php        # \Elgg\Event handlers (permissions, view replacement, criteria, comments addon) — renamed from Hooks.php
+│       ├── Menus.php         # menu:entity / menu:annotation registrations (\Elgg\Event signature)
 │       └── Upgrades/
 │           └── EncodeSettingsAsJson.php   # AsynchronousUpgrade — JSON re-encode legacy settings
 ├── lib/
@@ -41,31 +41,41 @@ elgg_stars/
 │   ├── stars/river/rating.php
 │   └── widgets/highestrating/{content,edit}.php
 ├── languages/
+│   └── en.php                # return [...] format (Elgg 5.x auto-discovers; add_translation() removed)
 ├── docker/
 │   ├── elgg3/                # 3.x verification stack
-│   └── elgg4/                # 4.x verification stack
+│   ├── elgg4/                # 4.x verification stack
+│   └── elgg5/                # 5.x verification stack (PHP 8.2, MySQL 8.0)
 └── vendors/
     └── rateit/               # jQuery RateIt JS library (bundled)
 ```
 
-## Registered Hooks / Events
+## Registered Events
 
-Declared in `elgg-plugin.php` under the `hooks` key — handlers use the Elgg 4.x
-single-argument `\Elgg\Hook` signature.
+Declared in `elgg-plugin.php` under the `events` key — handlers use the Elgg 5.x
+single-argument `\Elgg\Event` signature. (The 4.x `'hooks'` key was merged into
+`'events'` in 5.x — same shape, same semantics, unified type.)
 
-| Type | Trigger | Handler | Purpose |
-|------|---------|---------|---------|
-| hook | `register,menu:entity` | `ElggStars\Menus::entityMenu` | Append rating widget to entity menus |
-| hook | `register,menu:annotation` | `ElggStars\Menus::annotationMenu` | Delete-rating menu item |
-| hook | `permissions_check:annotate,all` | `ElggStars\Hooks::canAnnotate` | Block double-voting |
-| hook | `view,annotation/default` | `ElggStars\Hooks::annotationViewReplacement` | Use starrating view for rating annotations |
-| hook | `view,page/elements/comments` | `ElggStars\Hooks::commentsRatingAddon` (priority 900) | Append ratings module to comments page |
-| hook | `comments,all` | `ElggStars\Hooks::commentsRatingAddon` (priority 900) | Same for comments hook |
-| hook | `criteria,stars` | `ElggStars\Hooks::criteria` | Resolve granular per-type/subtype criteria |
+| Trigger | Handler | Purpose |
+|---------|---------|---------|
+| `register,menu:entity` | `ElggStars\Menus::entityMenu` | Append rating widget to entity menus |
+| `register,menu:annotation` | `ElggStars\Menus::annotationMenu` | Delete-rating menu item |
+| `permissions_check:annotate,all` | `ElggStars\Events::canAnnotate` | Block double-voting |
+| `view,annotation/default` | `ElggStars\Events::annotationViewReplacement` | Use starrating view for rating annotations |
+| `view,page/elements/comments` | `ElggStars\Events::commentsRatingAddon` (priority 900) | Append ratings module to comments page |
+| `comments,all` | `ElggStars\Events::commentsRatingAddon` (priority 900) | Same for comments event |
+| `criteria,stars` | `ElggStars\Events::criteria` | Resolve granular per-type/subtype criteria |
+
+Handler references in `elgg-plugin.php` are string literals
+(`'ElggStars\\Events::canAnnotate'`) rather than `Events::class . '::canAnnotate'`
+expressions — this keeps the declarative manifest fully serializable across the
+plugin-config cache. Iron Law 5 (no closures in elgg-plugin.php) still applies.
 
 `Bootstrap::init()` additionally registers (imperatively — these can't be expressed declaratively):
 - The `elgg_stars_annotation_names` registry of valid rating annotation names (from the `criteria` setting).
 - `elgg_extend_view('elgg.css', 'stars/css')` and `elgg_define_js('jquery.rateit', ...)` + `elgg_require_js('stars/init')`.
+
+Note: `elgg_define_js()` / `elgg_require_js()` / `elgg_load_external_file()` are still valid in 5.x and removed in 6.x — defer ES-module migration to the 5→6 step.
 
 ## Entities, Annotations, Routes, Actions
 
@@ -96,9 +106,10 @@ Declared in `elgg-plugin.php` (defaults: `min_value=0`, `max_value=5`, `step=1`)
 
 ## Dependencies
 
-- `elgg/elgg`: `^4.0`
+- `elgg/elgg`: `~5.1.0`
 - `composer/installers`: `^2.0`
-- PHP: `>=7.4` (Docker image targets 7.4)
+- `ext-intl`: `*` (required by Elgg 5.x)
+- PHP: `>=8.1` (Docker image targets 8.2)
 - No plugin-level dependencies.
 
 ## Seeding
@@ -115,47 +126,38 @@ than via `database:seed`.
 |-------|---------|---------|
 | `\ElggStars\Upgrades\EncodeSettingsAsJson` | 2026052400 | Re-encodes legacy PHP-serialized `type_subtype_pairs` and `granular_criteria` plugin settings as JSON, so the runtime serialize-fallback in `elgg_stars_decode_setting()` can be removed in a later major. Idempotent — skips when settings are already valid JSON. |
 
-## Migration Notes (3.x → 4.x)
+## Migration Notes (4.x → 5.x)
 
-Applied 2026-05-24 by skills/elgg-migrate (rules/3x-to-4x/manifest.json).
+Applied 2026-05-24 by skills/elgg-migrate (rules/4x-to-5x/manifest.json).
 
 Automated rule output:
-- `update-manifest-version`: `manifest.xml` bumped 3.0 → 4.0 (later deleted), `composer.json` `elgg/elgg` bumped to `^4.0`.
-- `amd-removed-apis-4x`: `views/default/js/stars/lib.js` — dropped `elgg/init` require, `elgg.echo()` → `i18n.echo()`, removed `elgg.provide()`.
-- `elgg-instanceof-4x`: `views/default/widgets/highestrating/content.php` — `elgg_instanceof()` → native `instanceof`.
-- `jquery-deprecated-apis-4x`: `vendors/rateit/jquery.rateit.js` — `.bind()/.unbind()` → `.on()/.off()`, `$.parseJSON` → `JSON.parse`, `$.isArray` → `Array.isArray`.
+- `update-manifest-version-5x`: `composer.json` `elgg/elgg` bumped to `~5.1.0`, `php` to `>=8.1`, added `ext-intl: *` (required by Elgg 5.x).
 
-Manual fixes (carried-forward residuals from 2→3):
-- **`start.php` → `elgg-plugin.php` + Bootstrap**: introduced `\ElggStars\Bootstrap` extending `\Elgg\PluginBootstrap`. `init()` registers the annotation-name registry, extends CSS, and defines `jquery.rateit` JS. `activate()` writes default min/max/step settings.
-- **`activate.php` removed**: logic moved to `Bootstrap::activate()`.
-- **`manifest.xml` removed**: Elgg 4.x reads metadata from `composer.json` and `elgg-plugin.php`.
-- **Hook signatures**: all handlers in `lib/hooks.php` migrated to static methods on `\ElggStars\Hooks` / `\ElggStars\Menus`, using single-argument `\Elgg\Hook` (gets `$hook->getValue()`, `$hook->getParam(...)`, `$hook->getParams()`).
-- **`elgg_get_entities_from_annotation_calculation()`** (deprecated in 3.x) → `elgg_get_entities()` with `annotation_name_value_pairs` + `OrderByClause` closure invoking `joinAnnotationTable()` + `AVG(value) DESC`, plus `group_by` on `e.guid`.
-
-Additional 4.x API fixes:
-- `forward(REFERER)` removed in 4.x — actions now `return elgg_ok_response()` / `elgg_error_response()` (ResponseBuilder pattern).
-- `create_annotation()` → `$entity->annotate()` in `actions/stars/rate.php`.
-- `ElggPlugin::getManifest()->getName()` → `$plugin->getDisplayName()` in admin settings save action.
-- `elgg_load_js()` removed in 4.x — replaced with `elgg_load_external_file('js', $name)` + `elgg_require_js()`.
-- `elgg_instanceof()` removed in 4.x — replaced with native PHP `instanceof` in `lib/functions.php`, `views/default/forms/stars/rate.php`, `views/default/stars/ratings.php`.
+Manual fixes (Elgg 5.x hooks-events merge):
+- **`elgg-plugin.php` `'hooks'` → `'events'`**: keys merged into a single `events` array; `version` bumped to `5.0.0`. Handler references switched from `Class::class . '::method'` PHP expressions to string literals (cross-plugin learning — avoids any chance of the const expression mis-rendering across the plugin-config cache).
+- **`classes/ElggStars/Hooks.php` → `Events.php`** (`git mv`): file renamed; class renamed `Hooks` → `Events`; `\Elgg\Hook` → `\Elgg\Event` type hints; parameter renamed `$hook` → `$event`. Same `getValue` / `getParam` / `getParams` / `getName` surface — the 5.x `Event` object preserves the 4.x `Hook` API.
+- **`classes/ElggStars/Menus.php`**: same `\Elgg\Hook` → `\Elgg\Event` migration; menu factory + filter logic unchanged.
+- **`lib/functions.php`**: `elgg_trigger_plugin_hook('criteria', 'stars', ...)` → `elgg_trigger_event_results('criteria', 'stars', ...)`. Same return semantics.
+- **`languages/en.php`**: `add_translation('en', $english)` removed in 5.x; converted to `return $english_array_literal` (Elgg 5.x auto-discovers the returned array). This was caught at install time — the previous-version skill missed it.
 
 Gate results (all PASS):
-- PostMigrationVerifier (no 4.x→5.x+ API leakage)
+- PostMigrationVerifier (no 5.x→6.x+ API leakage)
 - SecuritySweep (clean)
-- Docker activation in elgg4 (plugin activates, isActive=true)
-- Homepage render (7338 bytes), login render (7338 bytes), no PHP Fatal/Error
-- Simplecache CSS render (74140 bytes)
-- PHP_CodeSniffer (Elgg standard) — 0 errors after `phpcbf`
-- PHP syntax — clean
+- Docker activation in elgg5 (plugin activates, listed in activation log as `+ elgg_stars`)
+- Homepage render (8906 bytes), login render (8993 bytes), no PHP Fatal/Error
+- Simplecache CSS render (75716 bytes)
+- PHP_CodeSniffer (Elgg standard) — clean
+- PHP syntax — clean (excl. vendor)
 
-### Known carry-forwards (deferred to 4→5)
+### Known carry-forwards (deferred to 5→6)
 
-- Hook callbacks use 4.x `\Elgg\Hook` typed signature; converts to `\Elgg\Event` in 5.x (the `\Elgg\Hook`/`\Elgg\Event` split lands in 5.x).
-- `elgg_get_plugin_setting` callsites are already lowercase (`elgg_stars`) — no action required.
-- jQuery vendored RateIt may need further updates if 5.x bumps jQuery beyond 3.5.x.
+- `Bootstrap::init()` still uses `elgg_define_js('jquery.rateit', ...)` + `elgg_require_js('stars/init')`, and `views/default/output/stars.php` still uses `elgg_load_external_file('js', 'jquery.rateit')`. These are valid in 5.x; the 5→6 migration must convert to `elgg_register_esm()` / `elgg_import_esm()` and rewrite `views/default/js/stars/*.js` from AMD to ES modules.
+- `vendors/rateit/jquery.rateit.js` may need further updates if 6.x bumps jQuery.
+- No `Seeder` subclass — documented above. Reconsider in 5→6 if the bodyology test suite needs annotation fixtures from this plugin.
+- No PHPUnit suite on this branch. A test scaffold exists on the side branch `tests/elgg_stars-coverage` (off `migrate/elgg-3.x`); bead `7tkhb` tracks forward-merging it through the version chain.
 
 ## Data Preservation Notes
 
-- The `starrating` annotation subtype is preserved unchanged across the 3.x → 4.x boundary. Annotation storage shape (name, value, owner_guid, access_id) is identical.
+- The `starrating` annotation subtype is preserved unchanged across the 4.x → 5.x boundary. Annotation storage shape (name, value, owner_guid, access_id) is identical.
 - `bodyology_library/lib/events.php::bodyology_library_update_rating()` and `bodyology_feedback` continue to operate unchanged.
-- Plugin-setting array storage shape unchanged from 3.x (JSON). The upgrade batch (`EncodeSettingsAsJson`) remains registered for any 2.x site that hasn't yet run it.
+- Plugin-setting array storage shape unchanged from 4.x (JSON). The upgrade batch (`EncodeSettingsAsJson`) remains registered for any 2.x site that hasn't yet run it.

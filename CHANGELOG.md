@@ -1,5 +1,28 @@
 # Changelog
 
+## 5.0.0 — 2026-05-24
+
+Migrated to Elgg 5.x.
+
+### Added
+- `docker/elgg5/` — Elgg 5.x Docker infra template for migration verification (PHP 8.2, MySQL 8.0).
+- `classes/ElggStars/Events.php` — renamed from `Hooks.php`; handlers now type-hint `\Elgg\Event` (hooks and events merged in 5.x).
+
+### Changed
+- `composer.json` — bumped to `elgg/elgg: ~5.1.0`, `php: >=8.1`; `ext-intl` added (required by Elgg 5.x).
+- `elgg-plugin.php` — `version` bumped to `5.0.0`; `'hooks'` key renamed to `'events'`; handler refs converted to string literals (`'ElggStars\\Events::canAnnotate'`) so the declarative manifest stays serializable; `ElggStars\\Hooks` symbol references replaced with `ElggStars\\Events`.
+- `classes/ElggStars/Menus.php` — `\Elgg\Hook` → `\Elgg\Event` type hints; parameter renamed `$hook` → `$event`. Same API surface (`getValue` / `getParam` / `getParams` / `getName`).
+- `lib/functions.php` — `elgg_trigger_plugin_hook('criteria', 'stars', ...)` → `elgg_trigger_event_results('criteria', 'stars', ...)`.
+- `languages/en.php` — `add_translation('en', $arr)` removed in 5.x; converted to `return [...]` format (auto-discovered by Elgg).
+
+### Removed
+- `classes/ElggStars/Hooks.php` — renamed to `Events.php` (git history preserved via `git mv`).
+
+### Compatibility
+- Requires Elgg 5.x and PHP 8.1+.
+- `starrating` annotation subtype unchanged — downstream consumers (bodyology_library, bodyology_feedback) continue to work without changes.
+- Plugin setting storage shape unchanged from 4.x (JSON).
+
 ## 4.0.0 — 2026-05-24
 
 Migrated to Elgg 4.x.
