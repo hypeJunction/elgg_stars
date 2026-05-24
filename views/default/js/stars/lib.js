@@ -1,45 +1,51 @@
-define(['elgg', 'jquery', 'jquery.rateit'], function(elgg, $) {
+/**
+ * Stars rating library ES module (6.x).
+ *
+ * Exports init() which binds jQuery rateit to all '.rateit' inputs that don't
+ * already have a 'rateit-range' child, and wires up the 'rated' event so a
+ * change in a star widget POSTs to the surrounding stars/rate form.
+ */
+import 'jquery';
+import Ajax from 'elgg/Ajax';
+import i18n from 'elgg/i18n';
 
-	var stars = {
-		init: function() {
-			var selector = '.rateit:not(:has(.rateit-range))';
+export function init() {
+	const selector = '.rateit:not(:has(.rateit-range))';
 
-			$(selector).rateit();
+	$(selector).rateit();
 
-			$(document).off('rated', '.rateit').on('rated', '.rateit', function() {
-				var $elem = $(this);
-				var $form = $(this).closest('.elgg-form-stars-rate');
-				if (!$form.length) {
-					return true;
-				}
-
-				var guid = $elem.data('guid');
-				var annotation_name = $elem.data('annotationName');
-				var $starinput = $('.rateit[data-guid="' + guid + '"][data-annotation-name="' + annotation_name + '"]');
-				var $caption = $('.elgg-stars-rating-caption[data-guid="' + guid + '"][data-annotation-name="' + annotation_name + '"]');
-				elgg.action($form.attr('action'), {
-					data: $form.serialize(),
-					beforeSend: function() {
-						$starinput.rateit('readonly', true);
-						$starinput.rateit('ispreset', true);
-					},
-					success: function(data) {
-						if (data && data.output) {
-							values = data.output[guid][annotation_name];
-							$starinput.rateit('readonly', true);
-							$starinput.rateit('value', values.value);
-							$caption.text(i18n.echo('stars:stats', [values.value, values.max, values.count]));
-						} else {
-							$starinput.rateit('readonly', false);
-						}
-					},
-					complete: function() {
-						$starinput.rateit('ispreset', false);
-					}
-				});
-			});
+	$(document).off('rated', '.rateit').on('rated', '.rateit', function () {
+		const $elem = $(this);
+		const $form = $elem.closest('.elgg-form-stars-rate');
+		if (!$form.length) {
+			return true;
 		}
-	}
 
-	return stars;
-});
+		const guid = $elem.data('guid');
+		const annotationName = $elem.data('annotationName');
+		const $starinput = $('.rateit[data-guid="' + guid + '"][data-annotation-name="' + annotationName + '"]');
+		const $caption = $('.elgg-stars-rating-caption[data-guid="' + guid + '"][data-annotation-name="' + annotationName + '"]');
+
+		const ajax = new Ajax();
+		ajax.action($form.attr('action'), {
+			data: $form.serialize(),
+			beforeSend: function () {
+				$starinput.rateit('readonly', true);
+				$starinput.rateit('ispreset', true);
+			},
+			success: function (data) {
+				if (data && data.output) {
+					const values = data.output[guid][annotationName];
+					$starinput.rateit('readonly', true);
+					$starinput.rateit('value', values.value);
+					$caption.text(i18n.echo('stars:stats', [values.value, values.max, values.count]));
+				} else {
+					$starinput.rateit('readonly', false);
+				}
+			},
+			complete: function () {
+				$starinput.rateit('ispreset', false);
+			},
+		});
+	});
+}

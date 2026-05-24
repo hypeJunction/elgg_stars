@@ -8,9 +8,14 @@ use Elgg\PluginBootstrap;
  * elgg_stars plugin bootstrap.
  *
  * Wires up the rating annotation registry and JS dependencies that cannot be
- * expressed declaratively in elgg-plugin.php. Hooks, events, actions, widgets
+ * expressed declaratively in elgg-plugin.php. Events, actions, widgets
  * and view extensions are declared in elgg-plugin.php and routed to the
- * static handlers in {@see \ElggStars\Menus} / {@see \ElggStars\Hooks}.
+ * static handlers in {@see \ElggStars\Menus} / {@see \ElggStars\Events}.
+ *
+ * 6.x: legacy AMD modules (elgg_define_js / elgg_require_js) are gone; the
+ * stars init script is now an ES module registered via elgg_register_esm(),
+ * while the third-party jQuery rateit plugin (a non-ESM jQuery plugin) is
+ * served as a regular <script> tag via elgg_register_external_file().
  */
 class Bootstrap extends PluginBootstrap {
 
@@ -43,13 +48,29 @@ class Bootstrap extends PluginBootstrap {
 			}
 		}
 
-		// CSS extension and JS dependencies (cannot be declarative in 4.x for AMD modules).
+		// CSS extension.
 		elgg_extend_view('elgg.css', 'stars/css');
-		elgg_define_js('jquery.rateit', [
-			'src' => '/mod/elgg_stars/vendors/rateit/jquery.rateit.min.js',
-			'deps' => ['jquery'],
-		]);
-		elgg_require_js('stars/init');
+
+		// The third-party jQuery rateit plugin is not an ES module; register
+		// it as a regular external file so a <script> tag is emitted globally.
+		elgg_register_external_file(
+			'js',
+			'jquery.rateit',
+			elgg_normalize_url('mod/elgg_stars/vendors/rateit/jquery.rateit.min.js')
+		);
+
+		// Register the stars/init and stars/lib modules as ESM (they live under
+		// views/default/js/* with a .js extension, so they need explicit
+		// importmap entries). Auto-import init on every page.
+		elgg_register_esm(
+			'stars/lib',
+			elgg_get_simplecache_url('js/stars/lib.js')
+		);
+		elgg_register_esm(
+			'stars/init',
+			elgg_get_simplecache_url('js/stars/init.js')
+		);
+		elgg_import_esm('stars/init');
 	}
 
 	/**

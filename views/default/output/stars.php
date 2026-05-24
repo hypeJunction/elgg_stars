@@ -10,8 +10,11 @@
  * @uses $vars['step'] At what step the input values are iterated
  */
 
+// 6.x: jquery.rateit ships as a regular external file (registered in Bootstrap);
+// stars/init is an ES module registered + auto-imported in Bootstrap, so this
+// view doesn't need to load either explicitly.
 elgg_load_external_file('js', 'jquery.rateit');
-elgg_require_js('stars/init');
+elgg_import_esm('stars/init');
 
 $settings = elgg_stars_get_rating_settings();
 
