@@ -1,6 +1,6 @@
 # Stars
 
-![Elgg 5.x](https://img.shields.io/badge/Elgg-5.x-orange.svg?style=flat-square)
+![Elgg 6.x](https://img.shields.io/badge/Elgg-6.x-orange.svg?style=flat-square)
 
 Star rating widget for any Elgg entity — annotate, aggregate, and display.
 
@@ -53,7 +53,8 @@ $rating = elgg_stars_get_entity_rating_values($entity, ['starrating']);
 
 | Plugin version | Elgg version |
 |---|---|
-| current | 5.x |
+| current | 6.x |
+| 5.x | 5.x |
 | 4.x | 4.x |
 | 3.x | 3.x |
 

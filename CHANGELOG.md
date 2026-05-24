@@ -1,5 +1,30 @@
 # Changelog
 
+## 6.0.0 — 2026-05-24
+
+Migrated to Elgg 6.x.
+
+### Added
+- `docker/elgg6/` — Elgg 6.x Docker infra template for migration verification (PHP 8.2, MySQL 8.0+ / MariaDB 10.6+).
+
+### Changed
+- `composer.json` — bumped to `elgg/elgg: ~6.1.0`, `php: >=8.2`.
+- `elgg-plugin.php` — `version` bumped to `6.0.0`; everything else unchanged (declarative `events` config is forward-compatible with 6.x).
+- `classes/ElggStars/Bootstrap.php::init()` — converted AMD JS registrations to ES module registrations:
+  - `elgg_define_js('jquery.rateit', [...])` → `elgg_register_external_file('js', 'jquery.rateit', elgg_normalize_url(...))`. The third-party rateit plugin is a non-ESM jQuery plugin, served as a regular `<script>` tag.
+  - `elgg_require_js('stars/init')` → `elgg_register_esm('stars/lib', ...)` + `elgg_register_esm('stars/init', ...)` + `elgg_import_esm('stars/init')`. Both modules need explicit importmap registration because they keep `.js` extensions.
+- `views/default/output/stars.php` — `elgg_require_js('stars/init')` → `elgg_import_esm('stars/init')`; `elgg_load_external_file('js', 'jquery.rateit')` kept (still available in 6.x).
+- `views/default/js/stars/init.js` — AMD `define(function(require) { ... })` → ES module with `import 'jquery'` (side-effect import for global `$`) and `import { init } from 'stars/lib'`.
+- `views/default/js/stars/lib.js` — AMD `define(['elgg', 'jquery', 'jquery.rateit'], function(...))` → ES module: `import 'jquery'`, `import Ajax from 'elgg/Ajax'`, `import i18n from 'elgg/i18n'`, exported `init()`. `elgg.action(...)` (the 4.x global, unavailable in the ESM `elgg` module) replaced with `new Ajax().action(...)`.
+
+### Removed
+- `elgg_define_js()`, `elgg_require_js()` — removed in Elgg 6.0; replaced with `elgg_register_esm()` / `elgg_import_esm()` as documented above.
+
+### Compatibility
+- Requires Elgg 6.x, PHP 8.2+, MySQL 8.0+ or MariaDB 10.6+.
+- `starrating` annotation subtype unchanged — downstream consumers (bodyology_library, bodyology_feedback) continue to work without changes. Elgg 6.x annotation `n_table` → `a_table` alias change does not affect this plugin (no raw SQL / no `n_table` WHERE-closure use). The annotation `enabled` column removal does not affect this plugin (no enable/disable use).
+- Plugin setting storage shape unchanged from 5.x (JSON).
+
 ## 5.0.0 — 2026-05-24
 
 Migrated to Elgg 5.x.
