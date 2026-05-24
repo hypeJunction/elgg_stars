@@ -6,7 +6,7 @@ use ElggStars\Upgrades\EncodeSettingsAsJson;
 return [
 	'plugin' => [
 		'name' => 'Stars',
-		'version' => '5.0.0',
+		'version' => '6.0.0',
 	],
 	'bootstrap' => Bootstrap::class,
 	'settings' => [
