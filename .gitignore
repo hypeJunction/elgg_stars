@@ -13,3 +13,4 @@ coverage/
 .elgg-migrate*
 deps.lock.json
 em-*
+docker/elgg*/.env
