@@ -1,6 +1,6 @@
 <?php
 
-$english = array(
+return [
 
 	'stars:settings:ranges' => 'Rating Ranges',
 	'stars:settings:ranges:min_value' => 'Minimum value (default 0)',
@@ -24,12 +24,12 @@ $english = array(
 	'stars:widget:types:group' => 'Most rated groups',
 
 	'stars:rate' => 'Rate',
-    'stars:stats' => '%s/%s (%s votes)',
+	'stars:stats' => '%s/%s (%s votes)',
 	'stars:stats:totals' => 'Overall Rating',
-    'stars:saving' => 'Saving ...',
-    'stars:rate:error' => 'There was a problem saving your rating',
-    'stars:rate:success' => 'Your rating was successfully saved',
-    'stars:rate:alreadyrated' => 'Sorry, you can\'t rate the same item twice',
+	'stars:saving' => 'Saving ...',
+	'stars:rate:error' => 'There was a problem saving your rating',
+	'stars:rate:success' => 'Your rating was successfully saved',
+	'stars:rate:alreadyrated' => 'Sorry, you can\'t rate the same item twice',
 	'stars:delete:success' => 'Rating was successfully removed',
 	'stars:delete:error' => 'Rating could not be removed',
 
@@ -39,7 +39,4 @@ $english = array(
 
 	'stars:river:summary' => '%s rated %s\'s %s with %s stars',
 
-);
-
-add_translation("en", $english);
-?>
+];
