@@ -1,5 +1,28 @@
 # Changelog
 
+## 7.0.0 — 2026-05-24
+
+Migrated to Elgg 7.x.
+
+### Added
+- `docker/elgg7/` — Elgg 7.x Docker infra template for migration verification (PHP 8.3).
+- `composer.json` stability settings (applied by `ComposerStabilitySettings` AST rule): `minimum-stability: dev`, `prefer-stable: true`, and `asset-packagist.org` composer repository — required for Elgg 7.x.
+
+### Changed
+- `composer.json` — bumped to `elgg/elgg: ~7.0.0`, `php: >=8.3`.
+- `elgg-plugin.php` — `version` bumped to `7.0.0`. Everything else unchanged — the `'events'` key, handler signatures, settings, widgets, actions, and upgrades are all 7.x-compatible without edits.
+
+### Compatibility
+- Requires Elgg 7.x, PHP 8.3+.
+- `starrating` annotation subtype unchanged — downstream consumers (bodyology_library, bodyology_feedback) continue to work without changes.
+- Plugin setting storage shape unchanged from 6.x (JSON).
+- `elgg_register_external_file()` now returns `void` (was `bool` in 6.x). `Bootstrap::init()` does not use the return value, so the existing call is a no-op change.
+
+### Known carry-forwards
+- `vendors/rateit/jquery.rateit.{js,min.js}` — still a non-ESM jQuery plugin from upstream rateit. Elgg 7.x ships jQuery; the rateit widget continues to bind via the legacy `<script>` tag emitted by `elgg_register_external_file()`.
+- No `Seeder` subclass — documented in `ARCHITECTURE.md`. elgg_stars produces annotations on entities owned by other plugins; it has no entity types of its own. The `river_emittable` capability (new in 7.x) is therefore the responsibility of the consumer plugin (the entity owner), not elgg_stars.
+- No PHPUnit suite on this branch. Test scaffold lives on side branch `tests/elgg_stars-coverage`; bead `7tkhb` tracks forward-merging it through the version chain.
+
 ## 6.0.0 — 2026-05-24
 
 Migrated to Elgg 6.x.

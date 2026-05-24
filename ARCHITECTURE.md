@@ -3,7 +3,7 @@
 ## Summary
 
 **Name**: elgg_stars (Stars)
-**Version**: 6.0.0 — migrated to Elgg 6.x on 2026-05-24
+**Version**: 7.0.0 — migrated to Elgg 7.x on 2026-05-24
 **Purpose**: Star rating widget for Elgg entities.
 
 elgg_stars annotates Elgg objects (and any registered type/subtype pair) with
@@ -16,7 +16,7 @@ load-bearing for downstream consumers (bodyology_library, bodyology_feedback).
 ```
 elgg_stars/
 ├── elgg-plugin.php           # Declarative plugin manifest (plugin, bootstrap, actions, widgets, events, settings, upgrades)
-├── composer.json             # Plugin metadata; elgg/elgg ~6.1.0, php >=8.2
+├── composer.json             # Plugin metadata; elgg/elgg ~7.0.0, php >=8.3 (minimum-stability:dev, asset-packagist repo)
 ├── classes/
 │   └── ElggStars/
 │       ├── Bootstrap.php     # \Elgg\PluginBootstrap — load(), init(), activate(); registers ESM modules
@@ -47,7 +47,8 @@ elgg_stars/
 │   ├── elgg3/                # 3.x verification stack
 │   ├── elgg4/                # 4.x verification stack
 │   ├── elgg5/                # 5.x verification stack
-│   └── elgg6/                # 6.x verification stack (PHP 8.2, MySQL 8.0, MariaDB 10.6+)
+│   ├── elgg6/                # 6.x verification stack
+│   └── elgg7/                # 7.x verification stack (PHP 8.3)
 └── vendors/
     └── rateit/               # jQuery RateIt JS library (bundled, non-ESM jQuery plugin)
 ```
@@ -113,11 +114,13 @@ Declared in `elgg-plugin.php` (defaults: `min_value=0`, `max_value=5`, `step=1`)
 
 ## Dependencies
 
-- `elgg/elgg`: `~6.1.0`
+- `elgg/elgg`: `~7.0.0`
 - `composer/installers`: `^2.0`
-- `ext-intl`: `*` (required by Elgg 6.x)
-- PHP: `>=8.2` (Docker image targets 8.2)
-- MySQL `>=8.0` or MariaDB `>=10.6` (Elgg 6.x baseline)
+- `ext-intl`: `*` (required by Elgg 7.x)
+- PHP: `>=8.3` (Docker image targets 8.3)
+- MySQL `>=8.0` or MariaDB `>=10.6` (Elgg 7.x baseline)
+- composer `minimum-stability: dev` + `prefer-stable: true` (required by Elgg 7.x stability profile).
+- `asset-packagist.org` composer repository (required by Elgg 7.x asset deps).
 - No plugin-level dependencies.
 
 ## Seeding
@@ -133,6 +136,59 @@ than via `database:seed`.
 | Class | Version | Purpose |
 |-------|---------|---------|
 | `\ElggStars\Upgrades\EncodeSettingsAsJson` | 2026052400 | Re-encodes legacy PHP-serialized `type_subtype_pairs` and `granular_criteria` plugin settings as JSON, so the runtime serialize-fallback in `elgg_stars_decode_setting()` can be removed in a later major. Idempotent — skips when settings are already valid JSON. |
+
+## Migration Notes (6.x → 7.x)
+
+Applied 2026-05-24 by skills/elgg-migrate (rules/6x-to-7x/manifest.json).
+
+Automated rule output:
+- `composer-stability-settings-7x`: PASS — added `minimum-stability: dev`, `prefer-stable: true`, and `asset-packagist.org` composer repository to `composer.json`.
+- `reset-system-cache-7x`: skipped — no `elgg_reset_system_cache()` calls in the plugin.
+- `add-docblocks`: skipped — every function/method/property already documented from prior majors.
+
+LLM-guided rules surveyed (all NOT APPLICABLE — confirmed by grep):
+- `001-elggobject-abstract`: no direct `new ElggObject()` instantiation. (Plugin owns no entity types.)
+- `002-css-crush-removed`: no CSS Crush `$(varname)` syntax in `views/default/stars/css.php`.
+- `003-cache-backends-removed`: no memcache/redis references.
+- `004-mailer-laminas-to-symfony`: no `Elgg\Email\Address` / `Laminas\Mail` / `zend:message` / `emailer_*` references.
+- `005-font-awesome-v7`: no `fa-*` icon usage and no `elgg_view_icon()` calls in plugin views.
+- `006-notification-handler-renames`: no notification handler class references; no `elgg_register_notification_event()` / `elgg_unregister_notification_event()`.
+- `007-form-action-renames`: no references to renamed core forms / actions.
+- `008-response-event-changes`: no `ajax_response` / `forward` event handlers.
+- `009-button-classes-removed`: no `elgg-button-special` / `elgg-button-action-done`.
+- `010-group-route-changes`: no group collection route URL generation.
+- `011-action-renames`: no `admin/site/flush_cache` references.
+- `012-members-route-renames`: no `collection:user:user` / `search:user:user` references.
+- `013-messages-parameter-rename`: no messages-recipient parameter use.
+- `014-external-pages-rewrite`: no `expages` / `external_page` references.
+- `015-min-password-length`: no password validation logic.
+- `016-phpunit-12`: no PHPUnit suite on this branch (deferred to bead 7tkhb).
+- `017-river-emittable-capability`: elgg_stars creates river items via `elgg_create_river_item()` in `actions/stars/rate.php`, but the river item's `object_guid` points to an entity *owned by a downstream consumer* (e.g. `bodyology_library` library_entry). The `river_emittable` capability must be registered on the *entity-owning plugin*, not here. Documented in `Data Preservation Notes` below.
+- `018-entity-listing-limit-clamped`: no `elgg_list_entities()` calls; the `highestrating` widget uses `elgg_get_entities()` with an internally-set limit.
+- `019-ckeditor-v47`: no CKEditor customization.
+- `020-likes-visibility`: no likes interaction.
+- `021-webservices-changes`: no webservices / REST exposure.
+- `024-grid-css-extension-target`: `views/default/stars/css.php` is extended into `elgg.css` — not into `elements/grid`. Not affected.
+
+Manual fixes:
+- **`composer.json`**: `elgg/elgg` `~6.1.0` → `~7.0.0`, `php` `>=8.2` → `>=8.3`. Stability settings added by the AST rule above.
+- **`elgg-plugin.php`**: `version` `6.0.0` → `7.0.0`. Everything else unchanged — the `'events'` key, handler signatures, settings, widgets, actions, and upgrades are all 7.x-compatible without edits.
+- **`elgg_register_external_file()` in `Bootstrap::init()`**: signature change `bool → void` in 7.x. Call site does not use the return value, so no code change required; behaviour is identical.
+
+Gate results (all PASS via `verify-fleet --version=elgg7 --only=elgg_stars`):
+- PostMigrationVerifier (no 7.x→8.x+ API leakage) — PASS
+- SecuritySweep (clean) — PASS
+- PHP syntax (excl. vendor/vendors/tests) — PASS
+- Docker activation in elgg7 (plugin activates without throwing) — PASS
+- Homepage render (14496 bytes), login render (14591 bytes), no PHP Fatal/Error in Apache log — PASS
+- PHP_CodeSniffer (Elgg standard) — PASS (clean, no fixups required)
+- PHPUnit — SKIP (no test suite on this branch; tracked by bead 7tkhb)
+
+### Known carry-forwards (deferred beyond 7.x)
+
+- `vendors/rateit/jquery.rateit.{js,min.js}` — third-party non-ESM jQuery plugin still bundled in `vendors/`. Continues to work in 7.x via `elgg_register_external_file()` emitting a regular `<script>` tag. Long-term plan: when Elgg drops jQuery (post-7.x), replace with an ESM-friendly rating widget.
+- No `Seeder` subclass — documented under "Seeding". elgg_stars produces annotations on entities owned by other plugins; it has no entity types of its own.
+- No PHPUnit suite on this branch. A test scaffold exists on the side branch `tests/elgg_stars-coverage` (off `migrate/elgg-3.x`); bead `7tkhb` tracks forward-merging it through the version chain.
 
 ## Migration Notes (5.x → 6.x)
 
@@ -172,8 +228,22 @@ Gate results (all PASS):
 
 ## Data Preservation Notes
 
-- The `starrating` annotation subtype is preserved unchanged across the 5.x → 6.x boundary. Annotation storage shape (name, value, owner_guid, access_id) is identical. The 6.x annotation join-alias change (`n_table` → `a_table`) does not affect this plugin because all annotation queries go through `elgg_get_annotations()` (no raw SQL or WHERE-closure use of `n_table`).
+- The `starrating` annotation subtype is preserved unchanged across the 6.x → 7.x boundary (and across the full 2.x → 7.x chain). Annotation storage shape (name, value, owner_guid, access_id) is identical. No Elgg 7.x change affects annotation storage.
+- The 6.x annotation join-alias change (`n_table` → `a_table`) does not affect this plugin because all annotation queries go through `elgg_get_annotations()` (no raw SQL or WHERE-closure use of `n_table`).
 - The Elgg 6.x annotation `enabled` column removal does not affect this plugin — it never called `enable()`/`disable()` on annotations or used `elgg_disable_annotations()`/`elgg_enable_annotations()`.
 - Entity icon coordinate / `icontime` metadata removal in 6.x does not affect this plugin — it owns no entity types and does not handle entity icons.
-- `bodyology_library/lib/events.php::bodyology_library_update_rating()` and `bodyology_feedback` continue to operate unchanged.
+- `bodyology_library/lib/events.php::bodyology_library_update_rating()` and `bodyology_feedback` continue to operate unchanged on 7.x.
 - Plugin-setting array storage shape unchanged from 5.x (JSON). The upgrade batch (`EncodeSettingsAsJson`) remains registered for any 2.x/3.x site that hasn't yet run it.
+
+### Consumer-side note: river_emittable on 7.x
+
+`actions/stars/rate.php` calls `elgg_create_river_item()` with `object_guid =
+$entity->guid` where `$entity` is whatever entity is being rated — typically a
+`library_entry` (bodyology_library) or `feedback` (bodyology_feedback). In
+Elgg 7.x, river emission is gated by the `river_emittable` capability on the
+*entity type/subtype declaration*. That capability MUST be set in
+`elgg-plugin.php` on the entity-owning plugin — not on elgg_stars. If a
+consumer plugin's entity is not declared `river_emittable`, ratings on it
+will silently fail to produce river entries on 7.x. Consumer plugins
+(bodyology_library, bodyology_feedback) need to declare this capability when
+they migrate to 7.x; tracked separately under each plugin's 7.x migration bead.
