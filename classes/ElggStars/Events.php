@@ -24,7 +24,7 @@ class Events {
 		$user = $event->getParam('user');
 		$annotation_name = $event->getParam('annotation_name');
 
-		if (!elgg_stars_is_valid_rating_annotation_name($annotation_name)) {
+		if (!\elgg_stars_is_valid_rating_annotation_name($annotation_name)) {
 			return $return;
 		}
 
@@ -32,7 +32,7 @@ class Events {
 			return false;
 		}
 
-		return !elgg_stars_has_user_voted($entity, $user, $annotation_name);
+		return !\elgg_stars_has_user_voted($entity, $user, $annotation_name);
 	}
 
 	/**
@@ -45,14 +45,14 @@ class Events {
 	public static function annotationViewReplacement(Event $event) {
 		$return = $event->getValue();
 		$vars = $event->getParam('vars');
-		$annotation = elgg_extract('annotation', $vars);
+		$annotation = \elgg_extract('annotation', $vars);
 
 		if (!$annotation instanceof \ElggAnnotation) {
 			return $return;
 		}
 
-		if (elgg_stars_is_valid_rating_annotation_name($annotation->name)) {
-			return elgg_view('annotation/starrating', $vars);
+		if (\elgg_stars_is_valid_rating_annotation_name($annotation->name)) {
+			return \elgg_view('annotation/starrating', $vars);
 		}
 
 		return $return;
@@ -78,7 +78,7 @@ class Events {
 			$subtype = 'default';
 		}
 
-		$granular_criteria = elgg_stars_decode_setting(elgg_get_plugin_setting('granular_criteria', 'elgg_stars'));
+		$granular_criteria = \elgg_stars_decode_setting(\elgg_get_plugin_setting('granular_criteria', 'elgg_stars'));
 
 		if (!is_array($granular_criteria) || !isset($granular_criteria["$type:$subtype"])) {
 			return $return;
@@ -97,7 +97,7 @@ class Events {
 		$output = $event->getValue();
 		$vars = ($event->getName() === 'view') ? $event->getParam('vars') : $event->getParams();
 
-		$ratings_view = elgg_view('stars/ratings', $vars);
+		$ratings_view = \elgg_view('stars/ratings', $vars);
 
 		return $output . $ratings_view;
 	}

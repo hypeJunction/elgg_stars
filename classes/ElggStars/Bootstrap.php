@@ -33,23 +33,23 @@ class Bootstrap extends PluginBootstrap {
 	 */
 	public function init() {
 		// Register valid annotation names from plugin settings.
-		$criteria = elgg_get_plugin_setting('criteria', 'elgg_stars');
+		$criteria = \elgg_get_plugin_setting('criteria', 'elgg_stars');
 		if (!$criteria) {
-			elgg_stars_register_rating_annotation_name('starrating');
+			\elgg_stars_register_rating_annotation_name('starrating');
 		} else {
 			$criteria = string_to_tag_array($criteria);
 			foreach ($criteria as $criterion) {
-				elgg_stars_register_rating_annotation_name($criterion);
+				\elgg_stars_register_rating_annotation_name($criterion);
 			}
 		}
 
 		// CSS extension and JS dependencies (cannot be declarative in 4.x for AMD modules).
-		elgg_extend_view('elgg.css', 'stars/css');
-		elgg_define_js('jquery.rateit', [
+		\elgg_extend_view('elgg.css', 'stars/css');
+		\elgg_define_js('jquery.rateit', [
 			'src' => '/mod/elgg_stars/vendors/rateit/jquery.rateit.min.js',
 			'deps' => ['jquery'],
 		]);
-		elgg_require_js('stars/init');
+		\elgg_require_js('stars/init');
 	}
 
 	/**

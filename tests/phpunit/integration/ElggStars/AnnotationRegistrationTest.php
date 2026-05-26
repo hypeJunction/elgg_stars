@@ -26,20 +26,20 @@ class AnnotationRegistrationTest extends IntegrationTestCase {
 
 	public function testStarratingAnnotationNameIsRegistered(): void {
 		$this->assertTrue(
-			elgg_stars_is_valid_rating_annotation_name('starrating'),
+			\elgg_stars_is_valid_rating_annotation_name('starrating'),
 			'default starrating annotation name was not registered at init'
 		);
 	}
 
 	public function testUnknownAnnotationNameIsRejected(): void {
 		$this->assertFalse(
-			elgg_stars_is_valid_rating_annotation_name('definitely_not_a_rating_' . uniqid()),
+			\elgg_stars_is_valid_rating_annotation_name('definitely_not_a_rating_' . uniqid()),
 			'unknown annotation names must not be reported as valid ratings'
 		);
 	}
 
 	public function testGetRatingAnnotationNamesIncludesStarrating(): void {
-		$names = elgg_stars_get_rating_annotation_names();
+		$names = \elgg_stars_get_rating_annotation_names();
 		$this->assertIsArray($names);
 		$this->assertContains('starrating', $names);
 	}
@@ -48,9 +48,9 @@ class AnnotationRegistrationTest extends IntegrationTestCase {
 		// Registering the same name twice must not duplicate it in the
 		// global registry — duplicates would cause double-counting in
 		// elgg_get_entity_rating_values()'s annotation_names filter.
-		elgg_stars_register_rating_annotation_name('starrating');
-		elgg_stars_register_rating_annotation_name('starrating');
-		$names = elgg_get_config('elgg_stars_annotation_names');
+		\elgg_stars_register_rating_annotation_name('starrating');
+		\elgg_stars_register_rating_annotation_name('starrating');
+		$names = \elgg_get_config('elgg_stars_annotation_names');
 		$this->assertSame(
 			1,
 			count(array_filter($names, fn ($n) => $n === 'starrating')),
@@ -60,13 +60,13 @@ class AnnotationRegistrationTest extends IntegrationTestCase {
 
 	public function testRegisterCustomRatingAnnotationName(): void {
 		$custom = 'test_rating_' . uniqid();
-		elgg_stars_register_rating_annotation_name($custom);
-		$this->assertTrue(elgg_stars_is_valid_rating_annotation_name($custom));
+		\elgg_stars_register_rating_annotation_name($custom);
+		$this->assertTrue(\elgg_stars_is_valid_rating_annotation_name($custom));
 
 		// Restore registry: drop the custom name we just added so other tests
 		// keep a deterministic baseline.
-		$names = elgg_get_config('elgg_stars_annotation_names');
-		elgg_set_config(
+		$names = \elgg_get_config('elgg_stars_annotation_names');
+		\elgg_set_config(
 			'elgg_stars_annotation_names',
 			array_values(array_filter($names, fn ($n) => $n !== $custom))
 		);
@@ -83,11 +83,11 @@ class AnnotationRegistrationTest extends IntegrationTestCase {
 			$probe_called = true;
 			return $value;
 		};
-		elgg_register_plugin_hook_handler('criteria', 'stars', $probe);
+		\elgg_register_plugin_hook_handler('criteria', 'stars', $probe);
 		try {
-			elgg_stars_get_rating_annotation_names();
+			\elgg_stars_get_rating_annotation_names();
 		} finally {
-			elgg_unregister_plugin_hook_handler('criteria', 'stars', $probe);
+			\elgg_unregister_plugin_hook_handler('criteria', 'stars', $probe);
 		}
 		$this->assertTrue(
 			$probe_called,
