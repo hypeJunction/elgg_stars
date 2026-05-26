@@ -44,7 +44,7 @@ class EncodeSettingsAsJson implements AsynchronousUpgrade {
 	 * {@inheritdoc}
 	 */
 	public function shouldBeSkipped() {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		if (!$plugin instanceof \ElggPlugin) {
 			return true;
 		}
@@ -70,7 +70,7 @@ class EncodeSettingsAsJson implements AsynchronousUpgrade {
 	 * {@inheritdoc}
 	 */
 	public function run(Result $result, $offset) {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		if (!$plugin instanceof \ElggPlugin) {
 			$result->addError('elgg_stars plugin entity not found');
 			$result->addFailures(count(self::$arraySettings));

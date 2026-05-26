@@ -23,7 +23,7 @@ class Hooks {
 		$user = $hook->getParam('user');
 		$annotation_name = $hook->getParam('annotation_name');
 
-		if (!elgg_stars_is_valid_rating_annotation_name($annotation_name)) {
+		if (!\elgg_stars_is_valid_rating_annotation_name($annotation_name)) {
 			return $return;
 		}
 
@@ -31,7 +31,7 @@ class Hooks {
 			return false;
 		}
 
-		return !elgg_stars_has_user_voted($entity, $user, $annotation_name);
+		return !\elgg_stars_has_user_voted($entity, $user, $annotation_name);
 	}
 
 	/**
@@ -44,14 +44,14 @@ class Hooks {
 	public static function annotationViewReplacement(Hook $hook) {
 		$return = $hook->getValue();
 		$vars = $hook->getParam('vars');
-		$annotation = elgg_extract('annotation', $vars);
+		$annotation = \elgg_extract('annotation', $vars);
 
 		if (!$annotation instanceof \ElggAnnotation) {
 			return $return;
 		}
 
-		if (elgg_stars_is_valid_rating_annotation_name($annotation->name)) {
-			return elgg_view('annotation/starrating', $vars);
+		if (\elgg_stars_is_valid_rating_annotation_name($annotation->name)) {
+			return \elgg_view('annotation/starrating', $vars);
 		}
 
 		return $return;
@@ -77,7 +77,7 @@ class Hooks {
 			$subtype = 'default';
 		}
 
-		$granular_criteria = elgg_stars_decode_setting(elgg_get_plugin_setting('granular_criteria', 'elgg_stars'));
+		$granular_criteria = \elgg_stars_decode_setting(\elgg_get_plugin_setting('granular_criteria', 'elgg_stars'));
 
 		if (!is_array($granular_criteria) || !isset($granular_criteria["$type:$subtype"])) {
 			return $return;
@@ -96,7 +96,7 @@ class Hooks {
 		$output = $hook->getValue();
 		$vars = ($hook->getName() === 'view') ? $hook->getParam('vars') : $hook->getParams();
 
-		$ratings_view = elgg_view('stars/ratings', $vars);
+		$ratings_view = \elgg_view('stars/ratings', $vars);
 
 		return $output . $ratings_view;
 	}

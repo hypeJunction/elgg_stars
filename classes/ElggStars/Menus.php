@@ -21,7 +21,7 @@ class Menus {
 	public static function entityMenu(Hook $hook) {
 		$return = $hook->getValue();
 
-		if (!(bool) elgg_get_plugin_setting('extend_menu', 'elgg_stars')) {
+		if (!(bool) \elgg_get_plugin_setting('extend_menu', 'elgg_stars')) {
 			return $return;
 		}
 
@@ -30,7 +30,7 @@ class Menus {
 			return $return;
 		}
 
-		$type_subtype_pairs = elgg_stars_get_rateable_type_subtype_pairs();
+		$type_subtype_pairs = \elgg_stars_get_rateable_type_subtype_pairs();
 		$type = $entity->getType();
 		$subtype = $entity->getSubtype();
 
@@ -45,7 +45,7 @@ class Menus {
 		$starrating = [
 			'name' => 'stars',
 			'priority' => 10,
-			'text' => elgg_view_form('stars/rate', [], $hook->getParams()),
+			'text' => \elgg_view_form('stars/rate', [], $hook->getParams()),
 			'href' => false,
 			'encode_text' => false,
 			'section' => 'rating',
@@ -70,15 +70,15 @@ class Menus {
 			return $return;
 		}
 
-		if (!elgg_stars_is_valid_rating_annotation_name($annotation->name)) {
+		if (!\elgg_stars_is_valid_rating_annotation_name($annotation->name)) {
 			return $return;
 		}
 
 		if ($annotation->canEdit()) {
 			$return[] = ElggMenuItem::factory([
 				'name' => 'delete',
-				'text' => elgg_view_icon('delete'),
-				'href' => elgg_generate_action_url('stars/delete', ['annotation_id' => $annotation->id]),
+				'text' => \elgg_view_icon('delete'),
+				'href' => \elgg_generate_action_url('stars/delete', ['annotation_id' => $annotation->id]),
 				'confirm' => true,
 			]);
 		}
