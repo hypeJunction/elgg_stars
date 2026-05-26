@@ -14,7 +14,7 @@ use Elgg\Upgrade\Result;
  * keep working until this upgrade runs. After it completes, all settings are
  * stored as JSON and the legacy fallback path is unused.
  */
-class EncodeSettingsAsJson implements AsynchronousUpgrade {
+class EncodeSettingsAsJson extends AsynchronousUpgrade {
 
 	/**
 	 * Settings that historically held PHP-serialized arrays.
