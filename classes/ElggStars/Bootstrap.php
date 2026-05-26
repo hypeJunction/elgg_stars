@@ -38,39 +38,39 @@ class Bootstrap extends PluginBootstrap {
 	 */
 	public function init() {
 		// Register valid annotation names from plugin settings.
-		$criteria = elgg_get_plugin_setting('criteria', 'elgg_stars');
+		$criteria = \elgg_get_plugin_setting('criteria', 'elgg_stars');
 		if (!$criteria) {
-			elgg_stars_register_rating_annotation_name('starrating');
+			\elgg_stars_register_rating_annotation_name('starrating');
 		} else {
 			$criteria = string_to_tag_array($criteria);
 			foreach ($criteria as $criterion) {
-				elgg_stars_register_rating_annotation_name($criterion);
+				\elgg_stars_register_rating_annotation_name($criterion);
 			}
 		}
 
 		// CSS extension.
-		elgg_extend_view('elgg.css', 'stars/css');
+		\elgg_extend_view('elgg.css', 'stars/css');
 
 		// The third-party jQuery rateit plugin is not an ES module; register
 		// it as a regular external file so a <script> tag is emitted globally.
-		elgg_register_external_file(
+		\elgg_register_external_file(
 			'js',
 			'jquery.rateit',
-			elgg_normalize_url('mod/elgg_stars/vendors/rateit/jquery.rateit.min.js')
+			\elgg_normalize_url('mod/elgg_stars/vendors/rateit/jquery.rateit.min.js')
 		);
 
 		// Register the stars/init and stars/lib modules as ESM (they live under
 		// views/default/js/* with a .js extension, so they need explicit
 		// importmap entries). Auto-import init on every page.
-		elgg_register_esm(
+		\elgg_register_esm(
 			'stars/lib',
-			elgg_get_simplecache_url('js/stars/lib.js')
+			\elgg_get_simplecache_url('js/stars/lib.js')
 		);
-		elgg_register_esm(
+		\elgg_register_esm(
 			'stars/init',
-			elgg_get_simplecache_url('js/stars/init.js')
+			\elgg_get_simplecache_url('js/stars/init.js')
 		);
-		elgg_import_esm('stars/init');
+		\elgg_import_esm('stars/init');
 	}
 
 	/**

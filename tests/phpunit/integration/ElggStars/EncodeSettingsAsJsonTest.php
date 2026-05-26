@@ -26,7 +26,7 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 	public function up() {
 		// Save current setting values so each test starts from a known state
 		// and can restore the production-like baseline at tear-down.
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		$this->saved = [];
 		foreach (self::KEYS as $k) {
 			$this->saved[$k] = $plugin->getSetting($k);
@@ -34,7 +34,7 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 	}
 
 	public function down() {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		foreach ($this->saved ?? [] as $k => $v) {
 			if ($v === null || $v === false) {
 				$plugin->unsetSetting($k);
@@ -71,7 +71,7 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 	}
 
 	public function testShouldBeSkippedWhenAllSettingsAreJson(): void {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		$plugin->setSetting('type_subtype_pairs', json_encode(['object:blog']));
 		$plugin->setSetting('granular_criteria', json_encode(['object:blog' => ['accuracy']]));
 
@@ -83,7 +83,7 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 	}
 
 	public function testShouldNotBeSkippedWhenLegacySerializedPresent(): void {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		$plugin->setSetting('type_subtype_pairs', serialize(['object:blog']));
 
 		$u = new EncodeSettingsAsJson();
@@ -94,7 +94,7 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 	}
 
 	public function testRunConvertsLegacySerializedToJson(): void {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		$legacy_pairs = ['object:blog', 'object:page'];
 		$legacy_criteria = ['object:blog' => ['accuracy', 'clarity']];
 
@@ -117,7 +117,7 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 	}
 
 	public function testRunIsIdempotent(): void {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		$pairs = ['object:blog'];
 		$criteria = ['object:blog' => ['accuracy']];
 
@@ -161,7 +161,7 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 	}
 
 	public function testRunSkipsEmptySettings(): void {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		$plugin->unsetSetting('type_subtype_pairs');
 		$plugin->unsetSetting('granular_criteria');
 
@@ -173,7 +173,7 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 	}
 
 	public function testRunRecordsFailureOnUndecodableLegacy(): void {
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		// Garbage that's neither JSON nor valid serialize() output.
 		$plugin->setSetting('type_subtype_pairs', 'not-a-payload-' . uniqid());
 		$plugin->setSetting('granular_criteria', json_encode(['object:blog' => ['accuracy']]));
@@ -188,14 +188,14 @@ class EncodeSettingsAsJsonTest extends IntegrationTestCase {
 		// End-to-end: store legacy, run upgrade, then read via the plugin's
 		// own helper (elgg_stars_get_rateable_type_subtype_pairs) to confirm
 		// the readable shape matches the original.
-		$plugin = elgg_get_plugin_from_id('elgg_stars');
+		$plugin = \elgg_get_plugin_from_id('elgg_stars');
 		$legacy = ['object:blog', 'object:page', 'group:default'];
 		$plugin->setSetting('type_subtype_pairs', serialize($legacy));
 
 		$u = new EncodeSettingsAsJson();
 		$u->run(new Result(), 0);
 
-		$pairs = elgg_stars_get_rateable_type_subtype_pairs();
+		$pairs = \elgg_stars_get_rateable_type_subtype_pairs();
 		$this->assertArrayHasKey('object', $pairs);
 		$this->assertArrayHasKey('group', $pairs);
 		$this->assertContains('blog', $pairs['object']);
