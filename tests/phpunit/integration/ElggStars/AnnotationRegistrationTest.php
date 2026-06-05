@@ -83,11 +83,11 @@ class AnnotationRegistrationTest extends IntegrationTestCase {
 			$probe_called = true;
 			return $value;
 		};
-		elgg_register_plugin_hook_handler('criteria', 'stars', $probe);
+		elgg_register_event_handler('criteria', 'stars', $probe);
 		try {
 			elgg_stars_get_rating_annotation_names();
 		} finally {
-			elgg_unregister_plugin_hook_handler('criteria', 'stars', $probe);
+			elgg_unregister_event_handler('criteria', 'stars', $probe);
 		}
 		$this->assertTrue(
 			$probe_called,
