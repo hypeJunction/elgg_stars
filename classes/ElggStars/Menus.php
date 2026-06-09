@@ -45,7 +45,7 @@ class Menus {
 		$starrating = [
 			'name' => 'stars',
 			'priority' => 10,
-			'text' => elgg_view_form('stars/rate', [], $event->getParams()),
+			'text' => self::renderRateForm($event->getParams()),
 			'href' => false,
 			'encode_text' => false,
 			'section' => 'rating',
@@ -54,6 +54,45 @@ class Menus {
 		$return[] = ElggMenuItem::factory($starrating);
 
 		return $return;
+	}
+
+	/**
+	 * Render the rating form for use as menu item text.
+	 *
+	 * The entity menu handler may fire while an *outer* form is being rendered
+	 * (e.g. the admin plugin-settings form, or any page that scrapes menus via a
+	 * synthetic register,menu:entity event). elgg_view_form() toggles the shared
+	 * FormsService "rendering" flag off when it completes, which would corrupt
+	 * the outer form's deferred-footer logic and throw a LogicException from
+	 * FormsService::getFooter(). We snapshot and restore that flag around the
+	 * nested form render so the outer form is unaffected.
+	 *
+	 * @param array $params register,menu:entity event params (carries 'entity')
+	 * @return string Rendered form HTML
+	 */
+	protected static function renderRateForm(array $params): string {
+		$forms = _elgg_services()->forms;
+
+		$rendering_prop = null;
+		$was_rendering = false;
+		try {
+			$ref = new \ReflectionProperty($forms, 'rendering');
+			$ref->setAccessible(true);
+			$rendering_prop = $ref;
+			$was_rendering = (bool) $ref->getValue($forms);
+		} catch (\Throwable $e) {
+			// FormsService internals changed; fall back to plain render.
+			$rendering_prop = null;
+		}
+
+		$html = elgg_view_form('stars/rate', [], $params);
+
+		if ($rendering_prop instanceof \ReflectionProperty && $was_rendering) {
+			// Restore the outer form-rendering state clobbered by the nested form.
+			$rendering_prop->setValue($forms, true);
+		}
+
+		return $html;
 	}
 
 	/**

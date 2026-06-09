@@ -6,7 +6,7 @@
 
 $annotation = $vars['annotation'];
 
-$owner = get_entity($annotation->owner_guid);
+$owner = $annotation->owner_guid ? get_entity((int) $annotation->owner_guid) : null;
 if (!$owner) {
 	return true;
 }

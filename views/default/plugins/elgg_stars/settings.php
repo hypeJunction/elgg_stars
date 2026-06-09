@@ -83,7 +83,7 @@ foreach ($registered_entities as $type => $subtypes) {
 	}
 }
 
-$criteria = ($entity->criteria) ? string_to_tag_array($entity->criteria) : [];
+$criteria = ($entity->criteria) ? elgg_string_to_array((string) $entity->criteria) : [];
 foreach ($criteria as $criterion) {
 	$criteria_options[$criterion] = $criterion;
 }

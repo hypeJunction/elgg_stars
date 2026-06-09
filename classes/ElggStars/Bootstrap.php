@@ -42,7 +42,7 @@ class Bootstrap extends PluginBootstrap {
 		if (!$criteria) {
 			elgg_stars_register_rating_annotation_name('starrating');
 		} else {
-			$criteria = string_to_tag_array($criteria);
+			$criteria = elgg_string_to_array((string) $criteria);
 			foreach ($criteria as $criterion) {
 				elgg_stars_register_rating_annotation_name($criterion);
 			}
