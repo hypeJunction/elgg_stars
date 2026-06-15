@@ -29,21 +29,21 @@ class EncodeSettingsAsJson extends AsynchronousUpgrade {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getVersion() {
+	public function getVersion(): int {
 		return 2026052400;
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function needsIncrementOffset() {
+	public function needsIncrementOffset(): bool {
 		return false;
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function shouldBeSkipped() {
+	public function shouldBeSkipped(): bool {
 		$plugin = elgg_get_plugin_from_id('elgg_stars');
 		if (!$plugin instanceof \ElggPlugin) {
 			return true;
@@ -62,14 +62,14 @@ class EncodeSettingsAsJson extends AsynchronousUpgrade {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function countItems() {
+	public function countItems(): int {
 		return count(self::$arraySettings);
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function run(Result $result, $offset) {
+	public function run(Result $result, $offset): Result {
 		$plugin = elgg_get_plugin_from_id('elgg_stars');
 		if (!$plugin instanceof \ElggPlugin) {
 			$result->addError('elgg_stars plugin entity not found');
