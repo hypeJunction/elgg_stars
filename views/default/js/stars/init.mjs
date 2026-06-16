@@ -9,7 +9,7 @@
  * regular <script> tag (registered in Bootstrap), so it attaches to the
  * jQuery instance globally by the time this module runs.
  */
-import 'jquery';
+import $ from 'jquery';
 import { init } from 'stars/lib';
 
 if ($('.rateit').length) {
