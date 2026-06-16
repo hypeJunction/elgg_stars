@@ -5,7 +5,7 @@
  * already have a 'rateit-range' child, and wires up the 'rated' event so a
  * change in a star widget POSTs to the surrounding stars/rate form.
  */
-import 'jquery';
+import $ from 'jquery';
 import Ajax from 'elgg/Ajax';
 import i18n from 'elgg/i18n';
 

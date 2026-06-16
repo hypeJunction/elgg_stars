@@ -59,16 +59,16 @@ class Bootstrap extends PluginBootstrap {
 			elgg_normalize_url('mod/elgg_stars/vendors/rateit/jquery.rateit.min.js')
 		);
 
-		// Register the stars/init and stars/lib modules as ESM (they live under
-		// views/default/js/* with a .js extension, so they need explicit
-		// importmap entries). Auto-import init on every page.
+		// Register the stars/init and stars/lib modules as ESM. They live under
+		// views/default/js/* (a path that doesn't match the desired module name),
+		// so they need explicit importmap entries. Auto-import init on every page.
 		elgg_register_esm(
 			'stars/lib',
-			elgg_get_simplecache_url('js/stars/lib.js')
+			elgg_get_simplecache_url('js/stars/lib.mjs')
 		);
 		elgg_register_esm(
 			'stars/init',
-			elgg_get_simplecache_url('js/stars/init.js')
+			elgg_get_simplecache_url('js/stars/init.mjs')
 		);
 		elgg_import_esm('stars/init');
 	}
