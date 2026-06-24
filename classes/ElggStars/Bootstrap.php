@@ -51,11 +51,13 @@ class Bootstrap extends PluginBootstrap {
 		// CSS extension.
 		elgg_extend_view('elgg.css', 'stars/css');
 
-		// The third-party jQuery rateit plugin is not an ES module; register
-		// it as a regular external file so a <script> tag is emitted globally.
-		elgg_register_external_file(
-			'js',
-			'jquery.rateit',
+		// The third-party jQuery rateit plugin is a classic (non-ESM) jQuery
+		// plugin that references a GLOBAL jQuery. On Elgg 7 jQuery is an ES
+		// module, so a plain <script> tag runs before any global exists
+		// ("jQuery is not defined"). Register it in the importmap instead and
+		// side-effect import it from stars/init AFTER exposing window.jQuery.
+		elgg_register_esm(
+			'elgg_stars/rateit',
 			elgg_normalize_url('mod/elgg_stars/vendors/rateit/jquery.rateit.min.js')
 		);
 
