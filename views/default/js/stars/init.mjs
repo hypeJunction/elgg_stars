@@ -5,12 +5,17 @@
  * widget on any '.rateit' element present at load time and re-wires it after
  * AJAX responses that inject new '.rateit' nodes.
  *
- * The jquery.rateit plugin itself is a non-ESM jQuery plugin loaded via a
- * regular <script> tag (registered in Bootstrap), so it attaches to the
- * jQuery instance globally by the time this module runs.
+ * The jquery.rateit plugin is a classic (non-ESM) jQuery plugin that expects a
+ * GLOBAL jQuery. On Elgg 7 jQuery is an ES module, so we expose window.jQuery
+ * here and THEN side-effect import the rateit bundle (registered in the
+ * importmap in Bootstrap) so it attaches $.fn.rateit to this jQuery instance.
  */
 import $ from 'jquery';
 import { init } from 'stars/lib';
+
+// Expose the global the classic rateit plugin needs, then load it.
+window.$ = window.jQuery = $;
+await import('elgg_stars/rateit');
 
 if ($('.rateit').length) {
 	init();
